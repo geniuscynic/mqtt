@@ -1,7 +1,6 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Constant;
 using mqtt.server.Options;
-using Xjjxmm.Infrastructure.ToolKit;
 
 namespace mqtt.server.Packet;
 
@@ -19,8 +18,8 @@ internal class SubscribePacket : AbstractDataPacket
 
         _subjectByte = _subscribeOption.TopicName.ToBytes();
 
-        msb = RandomKit.RandomByte();
-        lsb = RandomKit.RandomByte();
+        msb = UtilHelpers.RandomByte();
+        lsb = UtilHelpers.RandomByte();
     }
 
     protected override void PushHeaders()
@@ -35,7 +34,7 @@ internal class SubscribePacket : AbstractDataPacket
         //剩余长度（Remaining Length）表示当前报文剩余部分的字节数，包括可变报头和负载的数据。剩余长度不包括用于编码剩余长度字段本身的字节数。也就是剩余长度 = 可变报头 + 有效载荷。
         var len = 2 + 2 + _subjectByte.Length + 1;
 
-        foreach (var l in client.test.Util.ComputeRemainingLength(len))
+        foreach (var l in client.test.UtilHelpers.ComputeRemainingLength(len))
         {
             Data.Add(Convert.ToByte(l));
         }

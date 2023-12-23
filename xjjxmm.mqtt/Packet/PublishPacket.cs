@@ -1,7 +1,6 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Constant;
 using mqtt.server.Options;
-using Xjjxmm.Infrastructure.ToolKit;
 
 namespace mqtt.server.Packet;
 
@@ -21,8 +20,8 @@ internal class PublishPacket : AbstractDataPacket
 
         _msgByte = publishOption.Message.ToBytes();
 
-        msb = RandomKit.RandomByte();
-        lsb = RandomKit.RandomByte();
+        msb = UtilHelpers.RandomByte();
+        lsb = UtilHelpers.RandomByte();
 
         PacketIdentifier = msb << 8 | lsb;
     }
@@ -63,7 +62,7 @@ internal class PublishPacket : AbstractDataPacket
             len += 2;
         }
 
-        foreach (var l in client.test.Util.ComputeRemainingLength(len))
+        foreach (var l in client.test.UtilHelpers.ComputeRemainingLength(len))
         {
             Data.Add(Convert.ToByte(l));
         }

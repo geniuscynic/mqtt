@@ -1,10 +1,16 @@
 ﻿using mqtt.server.Options;
-using XjjXmm.Infrastructure.Common;
 
 namespace mqtt.server.Packet;
 
-internal class ConnAckPacket : AbstractDataPacket
+internal class UnSubscribePacket : AbstractDataPacket
 {
+    private readonly UnSubscribeOption _option;
+
+    public UnSubscribePacket(UnSubscribeOption option)
+    {
+        _option = option;
+    }
+    
     protected override void PushHeaders()
     {
         throw new NotImplementedException();
@@ -27,11 +33,6 @@ internal class ConnAckPacket : AbstractDataPacket
 
     public override IOption Decode(ReceivedPacket buffer)
     {
-        ConnAckOption option = new();
-        var readerHelper = buffer.GetReaderHelper();
-        option.IsSessionPresent = readerHelper.Next() ==  1;
-        option.ReasonCode = readerHelper.Next();
-
-        return option;
+        throw new NotImplementedException();
     }
 }

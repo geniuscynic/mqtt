@@ -1,14 +1,10 @@
 ﻿using mqtt.server.Options;
-using XjjXmm.Infrastructure.Common;
+using xjjxmm.mqtt.Options;
 
 namespace mqtt.server.Packet;
 
-internal class SubAckPacket : AbstractDataPacket
+internal class PingRespPacket : AbstractDataPacket
 {
-  
-
- 
-
     protected override void PushHeaders()
     {
         throw new NotImplementedException();
@@ -29,16 +25,8 @@ internal class SubAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode(ReceivedPacket packet)
+    public override IOption Decode(ReceivedPacket buffer)
     {
-        var option = new SubAckOption();
-        var readerHelper = packet.GetReaderHelper();
-        var ids = readerHelper.NextTwoByteInt();
-        while (readerHelper.HasNext())
-        {
-            option.ReasonCodes.Add(readerHelper.Next());
-        }
-
-        return option;
+        return new PingRespOption();
     }
 }

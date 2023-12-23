@@ -1,8 +1,9 @@
 ﻿using mqtt.server.Options;
+using xjjxmm.mqtt.Options;
 
 namespace mqtt.server.Packet;
 
-internal class PingRespPacket : AbstractDataPacket
+internal class ConnAckPacket : AbstractDataPacket
 {
     protected override void PushHeaders()
     {
@@ -26,6 +27,11 @@ internal class PingRespPacket : AbstractDataPacket
 
     public override IOption Decode(ReceivedPacket buffer)
     {
-        return new PingRespOption();
+        ConnAckOption option = new();
+        var readerHelper = buffer.GetReaderHelper();
+        option.IsSessionPresent = readerHelper.Next() ==  1;
+        option.ReasonCode = readerHelper.Next();
+
+        return option;
     }
 }

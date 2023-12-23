@@ -11,8 +11,3 @@ public record PingReqOption : IOption
 {
 
 }
-
-public record PingRespOption : IOption
-{
-
-}

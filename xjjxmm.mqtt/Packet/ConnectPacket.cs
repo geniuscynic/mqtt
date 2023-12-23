@@ -46,7 +46,7 @@ namespace mqtt.server.Packet
                 len += 2 + _passwordByte.Length;
             }
 
-            foreach (var l in client.test.Util.ComputeRemainingLength(len))
+            foreach (var l in UtilHelpers.ComputeRemainingLength(len))
             {
                 Data.Add(Convert.ToByte(l));
             }
