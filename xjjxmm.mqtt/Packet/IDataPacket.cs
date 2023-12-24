@@ -6,5 +6,5 @@ interface IDataPacket
 {
     ArraySegment<byte> Encode();
 
-    IOption Decode(ReceivedPacket buffer);
+    IOption Decode();
 }

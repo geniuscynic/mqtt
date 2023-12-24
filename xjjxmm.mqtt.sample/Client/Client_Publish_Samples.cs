@@ -13,17 +13,9 @@ using mqtt.server.Options;
 
 namespace xjjxmm.mqtt.sample.Client;
 
-public static class Client_Connection_Samples
+public static class Client_Publish_Samples
 {
-    public static async Task Clean_Disconnect()
-    {
-        var mqttClient = new MqttClient();
-        
-        var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId");
-        await mqttClient.Connect(mqttClientOptions);
-    }
-
-    public static async Task Connect_Client()
+    public static async Task PublishQos0()
     {
         var mqttClient = new MqttClient();
         mqttClient.ConnAckAction = option =>
@@ -35,13 +27,14 @@ public static class Client_Connection_Samples
         {
             option.ToString().Dump();
         };
-
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
             CleanSession = false
         };
         await mqttClient.Connect(mqttClientOptions);
+        
+        await mqttClient.Publish(new PublishOption("testTopic", "testMessage1"));
     }
     
 }

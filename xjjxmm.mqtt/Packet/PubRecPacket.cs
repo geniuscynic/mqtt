@@ -47,7 +47,7 @@ internal class PubRecPacket : AbstractDataPacket
 
     }
 
-    public override IOption Decode(ReceivedPacket buffer)
+    public override IOption Decode()
     {
         throw new NotImplementedException();
     }

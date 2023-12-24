@@ -6,6 +6,7 @@ using mqtt.server.Options;
 using mqtt.server.Packet;
 using mqtt.server.Util;
 using xjjxmm.mqtt.Options;
+using xjjxmm.mqtt.Packet;
 
 namespace mqtt.server;
 
@@ -13,6 +14,7 @@ internal class MqttChannel : IDisposable
 {
     private SocketClient _socketClient;
 
+    private CancellationTokenSource _cancellationTokenSource = new();
     public Action<ConnAckOption>? ConnAckAction { get; set; }
 
     public Action<SubAckOption>? SubAckAction{ get; set; }
@@ -35,67 +37,17 @@ internal class MqttChannel : IDisposable
         //创建与远程主机的连接
     }
 
-    public async Task Connect(ConnectOption option)
+    public async Task SendConnect(ConnectOption option)
     {
         await _socketClient.Connect(option.Host, option.Port);
-        await _socketClient.Send(new ConnectPacket(option).Encode());
+        await _socketClient.Send(new ConnectPacket(option).Encode(), _cancellationTokenSource.Token);
 
         Receive();
     }
     
-    public async Task PingReq(PingReqOption option)
-    {
-        await _socketClient.Send(new PingReqPacket(option).Encode());
-    }
-    
-    public async Task Publish(PublishOption option)
-    {
-        await _socketClient.Send(new PublishPacket(option).Encode());
-    }
-
-    public async Task SendPubAck(PubAckOption option)
-    {
-        await _socketClient.Send(new PubAckPacket(option).Encode());        
-    }
-    
-    public void ReceivePubAck(ReceivedPacket buffer)
-    {
-        var option = (PubAckOption) new PubAckPacket().Decode(buffer);
-        PubAckAction?.Invoke(option);
-    }
-
-    public async Task SendPubRec(PubRecOption option)
-    {
-        await _socketClient.Send(new PubRecPacket(option).Encode());
-    }
-    
-    public void ReceivePubRec(ReceivedPacket buffer)
-    {
-        var option = (PubRecOption) new PubRecPacket().Decode(buffer);
-        PubRecAction?.Invoke(option);
-    }
-    
-    public void ReceivePubRel(ReceivedPacket buffer)
-    {
-        var option = (PubRelOption) new PubRelPacket().Decode(buffer);
-        PubRelAction?.Invoke(option);
-    }
-    
-    public void ReceivePubComp(ReceivedPacket buffer)
-    {
-        var option = (PubCompOption) new PubCompPacket().Decode(buffer);
-        PubCompAction?.Invoke(option);
-    }
-    
-    private void ReceivePingResp(ReceivedPacket buffer)
-    {
-        var option = (PingRespOption) new PingRespPacket().Decode(buffer);
-        PingRespAction?.Invoke(option);
-    }
-    
     private void ReceiveConnAck(ReceivedPacket buffer)
     {
-        var connAck = (ConnAckOption) new ConnAckPacket().Decode(buffer);
+        var connAck = (ConnAckOption) new ConnAckPacket().Decode();
 
         if (connAck.ReasonCode != ConnectReturnCode.Accepted)
         {
@@ -105,26 +57,78 @@ internal class MqttChannel : IDisposable
         ConnAckAction?.Invoke(connAck);
     }
     
+    public async Task PingReq(PingReqOption option)
+    {
+        await _socketClient.Send(new PingReqPacket(option).Encode(), _cancellationTokenSource.Token);
+    }
+    
+    public async Task SendPublish(PublishOption option)
+    {
+        await _socketClient.Send(new PublishPacket(option).Encode(), _cancellationTokenSource.Token);
+    }
+
+    public async Task SendPubAck(PubAckOption option)
+    {
+        await _socketClient.Send(new PubAckPacket(option).Encode(), _cancellationTokenSource.Token);        
+    }
+    
+    public void ReceivePubAck(ReceivedPacket buffer)
+    {
+        var option = (PubAckOption) new PubAckPacket().Decode();
+        PubAckAction?.Invoke(option);
+    }
+
+    public async Task SendPubRec(PubRecOption option)
+    {
+        await _socketClient.Send(new PubRecPacket(option).Encode(), _cancellationTokenSource.Token);
+    }
+    
+    public void ReceivePubRec(ReceivedPacket buffer)
+    {
+        var option = (PubRecOption) new PubRecPacket().Decode();
+        PubRecAction?.Invoke(option);
+    }
+    
+    public void ReceivePubRel(ReceivedPacket buffer)
+    {
+        var option = (PubRelOption) new PubRelPacket().Decode();
+        PubRelAction?.Invoke(option);
+    }
+    
+    public void ReceivePubComp(ReceivedPacket buffer)
+    {
+        var option = (PubCompOption) new PubCompPacket().Decode();
+        PubCompAction?.Invoke(option);
+    }
+    
+    private void ReceivePingResp(ReceivedPacket buffer)
+    {
+        var option = (PingRespOption) new PingRespPacket().Decode();
+        PingRespAction?.Invoke(option);
+    }
+    
+
+    
     public async Task Subscribe(SubscribeOption option)
     {
-        await _socketClient.Send(new SubscribePacket(option).Encode());
+        await _socketClient.Send(new SubscribePacket(option).Encode(), _cancellationTokenSource.Token);
     }
     
     public void ReceiveSuback(ReceivedPacket buffer)
     {
-        var option = (SubAckOption) new SubAckPacket().Decode(buffer);
+        var option = (SubAckOption) new SubAckPacket().Decode();
         
         SubAckAction?.Invoke(option);
     }
 
     public async Task UnSubscribe(UnSubscribeOption option)
     {
-        await _socketClient.Send(new UnSubscribePacket(option).Encode());
+        await _socketClient.Send(new UnSubscribePacket(option).Encode(), _cancellationTokenSource.Token);
     }
     
     public async Task ReceiveUnSubAck(UnSubAckOption option)
     {
-        await _socketClient.Send(new UnSubAckPacket(option).Encode());
+        await _socketClient.Send(new UnSubAckPacket(option).Encode(), _cancellationTokenSource.Token);
         UnSubAckAction?.Invoke(option);
     }
     

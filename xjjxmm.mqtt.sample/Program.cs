@@ -6,9 +6,11 @@
 //https://mcxiaoke.gitbooks.io/mqtt-cn/content/
 using System.Net;
 using System.Net.Sockets;
+using xjjxmm.mqtt.sample.Client;
 
-//var server = new SocketServer("127.0.0.1", 1883);
-//await server.Start();
+
+//await Client_Connection_Samples.Connect_Client();
+await Client_Publish_Samples.PublishQos0();
 
 Console.WriteLine("Hello, World!");
 Console.Read();

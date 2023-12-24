@@ -31,7 +31,7 @@ internal class UnSubAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode(ReceivedPacket buffer)
+    public override IOption Decode()
     {
         throw new NotImplementedException();
     }

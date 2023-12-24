@@ -25,7 +25,7 @@ internal class PingRespPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode(ReceivedPacket buffer)
+    public override IOption Decode()
     {
         return new PingRespOption();
     }

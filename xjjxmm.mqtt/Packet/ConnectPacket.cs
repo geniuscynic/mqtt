@@ -121,7 +121,7 @@ namespace mqtt.server.Packet
             }
         }
 
-        public override IOption Decode(ReceivedPacket buffer)
+        public override IOption Decode()
         {
             throw new NotImplementedException();
         }

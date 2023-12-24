@@ -1,11 +1,17 @@
-﻿using mqtt.server.Options;
+﻿using mqtt.server;
+using mqtt.server.Options;
+using mqtt.server.Packet;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
 internal class SubAckPacket : AbstractDataPacket
 {
-  
+    private readonly ReceivedPacket _buffer;
 
+    public SubAckPacket(ReceivedPacket buffer)
+    {
+        _buffer = buffer;
+    }
  
 
     protected override void PushHeaders()
@@ -28,10 +34,10 @@ internal class SubAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode(ReceivedPacket packet)
+    public override IOption Decode()
     {
         var option = new SubAckOption();
-        var readerHelper = packet.GetReaderHelper();
+        var readerHelper = _buffer.GetReaderHelper();
         var ids = readerHelper.NextTwoByteInt();
         while (readerHelper.HasNext())
         {

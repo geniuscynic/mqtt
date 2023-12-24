@@ -1,16 +1,20 @@
-﻿using mqtt.server.Constant;
+﻿using mqtt.server;
+using mqtt.server.Constant;
 using mqtt.server.Options;
+using mqtt.server.Packet;
+using xjjxmm.mqtt.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
 internal class PubAckPacket : AbstractDataPacket
 {
+    private readonly ReceivedPacket _buffer;
     private readonly byte msb;
     private readonly byte lsb;
 
-    public PubAckPacket()
+    public PubAckPacket(ReceivedPacket buffer)
     {
-        
+        _buffer = buffer;
     }
 
     public PubAckPacket(PubAckOption option)
@@ -18,11 +22,11 @@ internal class PubAckPacket : AbstractDataPacket
         
     }
     
-    public PubAckPacket(int packetIdentifier)
+    /*public PubAckPacket(int packetIdentifier)
     {
         msb = (byte)(packetIdentifier >> 8);
         lsb = (byte)(packetIdentifier & 255);
-    }
+    }*/
 
     protected override void PushHeaders()
     {
@@ -47,7 +51,7 @@ internal class PubAckPacket : AbstractDataPacket
 
     }
 
-    public override IOption Decode(ReceivedPacket buffer)
+    public override IOption Decode()
     {
         return new PubAckOption();
     }

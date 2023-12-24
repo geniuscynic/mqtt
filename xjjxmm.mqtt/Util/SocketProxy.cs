@@ -75,9 +75,9 @@ namespace mqtt.server.Util
         /// <param name="buffer"></param>
         /// <param name="socketFlags"></param>
         /// <returns></returns>
-        public async Task<int> Send(ArraySegment<byte> buffer)
+        public async Task<int> Send(ArraySegment<byte> buffer, CancellationToken cancellationToken)
         {
-            return await _socket.SendAsync(buffer, SocketFlags.None);
+            return await _socket.SendAsync(buffer, SocketFlags.None, cancellationToken);
         }
         
         /// <summary>
@@ -86,9 +86,9 @@ namespace mqtt.server.Util
         /// <param name="buffer"></param>
         /// <param name="socketFlags"></param>
         /// <returns></returns>
-        public async Task<int> Send(ArraySegment<byte> buffer, SocketFlags socketFlags)
+        public async Task<int> Send(ArraySegment<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
-            return await _socket.SendAsync(buffer, socketFlags);
+            return await _socket.SendAsync(buffer, socketFlags, cancellationToken);
         }
         
         /// <summary>

@@ -7,7 +7,7 @@ namespace mqtt.server.Options
         
         public byte ProtocolLevel { get; set; } = Protocol.Level3; //协议级别 
 
-        public bool CleanSession { get; set; } = false; //清理会话
+        public bool CleanSession { get; set; } = true; //清理会话
 
         public bool WillFlag => !string.IsNullOrEmpty(WillTopic);
 
@@ -15,7 +15,7 @@ namespace mqtt.server.Options
 
         public string WillMessage { get; set; } = string.Empty; //遗嘱消息
 
-        public byte QoS { get; set; } = Qos.Qos0; //QoS 
+        public byte QoS { get; set; } = Qos.AtMostOnce; //QoS 
 
         public bool Retain { get; set; } = false; //遗嘱保留 
 
@@ -27,6 +27,6 @@ namespace mqtt.server.Options
 
         public string Password { get; set; } = string.Empty;
 
-        public int KeepAliveSecond { get; set; } = 300;
+        public int KeepAliveSecond { get; set; } = 60;
     }
 }

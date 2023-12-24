@@ -5,6 +5,13 @@ namespace mqtt.server.Packet;
 
 internal class ConnAckPacket : AbstractDataPacket
 {
+    private readonly ReceivedPacket _buffer;
+
+    public ConnAckPacket(ReceivedPacket buffer)
+    {
+        _buffer = buffer;
+    }
+    
     protected override void PushHeaders()
     {
         throw new NotImplementedException();
@@ -25,10 +32,10 @@ internal class ConnAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode(ReceivedPacket buffer)
+    public override IOption Decode()
     {
         ConnAckOption option = new();
-        var readerHelper = buffer.GetReaderHelper();
+        var readerHelper = _buffer.GetReaderHelper();
         option.IsSessionPresent = readerHelper.Next() ==  1;
         option.ReasonCode = readerHelper.Next();
 

@@ -1,4 +1,5 @@
-﻿using mqtt.server.Options;
+﻿using mqtt.client.test;
+using mqtt.server.Options;
 
 namespace mqtt.server.Packet;
 
@@ -37,10 +38,10 @@ internal abstract class AbstractDataPacket : IDataPacket
         PushVariableHeader();
         PushPayload();
 
-        //Data.Dump();
+        Data.Dump();
 
         return Data.ToArray();
     }
 
-    public abstract IOption Decode(ReceivedPacket buffer);
+    public abstract IOption Decode();
 }
