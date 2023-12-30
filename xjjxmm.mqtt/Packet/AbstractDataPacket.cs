@@ -1,9 +1,9 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal abstract class AbstractDataPacket : IDataPacket
+internal abstract class AbstractDataPacket<T> : IDataPacket<T> where T : IOption
 {
     protected List<byte> Data { get; set; } = new List<byte>();
 
@@ -43,5 +43,5 @@ internal abstract class AbstractDataPacket : IDataPacket
         return Data.ToArray();
     }
 
-    public abstract IOption Decode();
+    public abstract T Decode();
 }

@@ -1,8 +1,9 @@
 ﻿using mqtt.server.Constant;
+using mqtt.server.Options;
 
-namespace mqtt.server.Options
+namespace xjjxmm.mqtt.Options
 {
-    public record ConnectOption(string Host, int Port, string ClientId)
+    public record ConnectOption(string Host, int Port, string ClientId) : IOption
     {
         
         public byte ProtocolLevel { get; set; } = Protocol.Level3; //协议级别 

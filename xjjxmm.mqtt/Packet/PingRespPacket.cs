@@ -1,9 +1,9 @@
 ﻿using mqtt.server.Options;
 using xjjxmm.mqtt.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class PingRespPacket : AbstractDataPacket
+internal class PingRespPacket : AbstractDataPacket<PingRespOption>
 {
     protected override void PushHeaders()
     {
@@ -25,7 +25,7 @@ internal class PingRespPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode()
+    public override PingRespOption Decode()
     {
         return new PingRespOption();
     }

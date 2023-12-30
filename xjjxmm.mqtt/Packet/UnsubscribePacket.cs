@@ -1,8 +1,9 @@
 ﻿using mqtt.server.Options;
+using mqtt.server.Packet;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class UnSubscribePacket : AbstractDataPacket
+internal class UnSubscribePacket : AbstractDataPacket<UnSubscribeOption>
 {
     private readonly UnSubscribeOption _option;
 
@@ -31,7 +32,7 @@ internal class UnSubscribePacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode()
+    public override UnSubscribeOption Decode()
     {
         throw new NotImplementedException();
     }

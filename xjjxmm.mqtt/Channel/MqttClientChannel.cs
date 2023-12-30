@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using mqtt.client.test;
+﻿using mqtt.server;
 using mqtt.server.Constant;
 using mqtt.server.Options;
 using mqtt.server.Packet;
@@ -8,7 +6,7 @@ using mqtt.server.Util;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
 
-namespace mqtt.server;
+namespace xjjxmm.mqtt.Channel;
 
 internal class MqttChannel : IDisposable
 {
@@ -23,7 +21,7 @@ internal class MqttChannel : IDisposable
 
     public Action<PubAckOption>? PubAckAction{ get; set; }
     
-    public Action<PubRecOption>? PubRecAction{ get; set; }
+    public Func<PubRecOption, Task>? PubRecAction{ get; set; }
     
     public Action<PubRelOption>? PubRelAction{ get; set; }
     
@@ -47,7 +45,7 @@ internal class MqttChannel : IDisposable
     
     private void ReceiveConnAck(ReceivedPacket buffer)
     {
-        var connAck = (ConnAckOption) new ConnAckPacket().Decode();
+        var connAck = (ConnAckOption) new ConnAckPacket(buffer).Decode();
 
         if (connAck.ReasonCode != ConnectReturnCode.Accepted)
         {
@@ -74,7 +72,7 @@ internal class MqttChannel : IDisposable
     
     public void ReceivePubAck(ReceivedPacket buffer)
     {
-        var option = (PubAckOption) new PubAckPacket().Decode();
+        var option = (PubAckOption) new PubAckPacket(buffer).Decode();
         PubAckAction?.Invoke(option);
     }
 
@@ -83,21 +81,29 @@ internal class MqttChannel : IDisposable
         await _socketClient.Send(new PubRecPacket(option).Encode(), _cancellationTokenSource.Token);
     }
     
-    public void ReceivePubRec(ReceivedPacket buffer)
+    public async Task  ReceivePubRec(ReceivedPacket buffer)
     {
-        var option = (PubRecOption) new PubRecPacket().Decode();
-        PubRecAction?.Invoke(option);
+        var option = (PubRecOption) new PubRecPacket(buffer).Decode();
+        if (PubRecAction != null)
+        {
+            await PubRecAction.Invoke(option);
+        }
+    }
+    
+    public async Task SendPubRel(PubRelOption option)
+    {
+        await _socketClient.Send(new PubRelPacket(option).Encode(), _cancellationTokenSource.Token);
     }
     
     public void ReceivePubRel(ReceivedPacket buffer)
     {
-        var option = (PubRelOption) new PubRelPacket().Decode();
+        var option = (PubRelOption) new PubRelPacket(buffer).Decode();
         PubRelAction?.Invoke(option);
     }
     
     public void ReceivePubComp(ReceivedPacket buffer)
     {
-        var option = (PubCompOption) new PubCompPacket().Decode();
+        var option = new PubCompPacket(buffer).Decode();
         PubCompAction?.Invoke(option);
     }
     
@@ -116,7 +122,7 @@ internal class MqttChannel : IDisposable
     
     public void ReceiveSuback(ReceivedPacket buffer)
     {
-        var option = (SubAckOption) new SubAckPacket().Decode();
+        var option = (SubAckOption) new SubAckPacket(buffer).Decode();
         
         SubAckAction?.Invoke(option);
     }
@@ -131,10 +137,6 @@ internal class MqttChannel : IDisposable
         await _socketClient.Send(new UnSubAckPacket(option).Encode(), _cancellationTokenSource.Token);
         UnSubAckAction?.Invoke(option);
     }
-    
-   
-
-    
     
     public void Dispose()
     {
@@ -154,33 +156,36 @@ internal class MqttChannel : IDisposable
                 var remainingLength = buffer[1];
                 var body = await _socketClient.Receive(remainingLength);
                 var receivePacket = new ReceivedPacket(buffer[0], remainingLength, body);
-                 if (buffer[0] == (PacketType.CONNACK << 4))
+                 switch (buffer[0])
                  {
-                     ReceiveConnAck(receivePacket);
-                 }
-                else if (buffer[0] == PacketType.SUBACK << 4 )
-                {
-                    ReceiveSuback(receivePacket);
-                }
-                 else if (buffer[0] == PacketType.PINGRESP << 4 )
-                 {
-                     ReceivePingResp(receivePacket);
-                 }
-                 else if (buffer[0] == PacketType.PUBLISH << 4 )
-                 {
-                     ReceivePubAck(receivePacket);
-                 }
-                 else if (buffer[0] == PacketType.PUBREC << 4 )
-                 {
-                     ReceivePubRec(receivePacket);
-                 }
-                 else if (buffer[0] == PacketType.PUBREL << 4 )
-                 {
-                     ReceivePubRel(receivePacket);
-                 }
-                 else if (buffer[0] == PacketType.UNSUBACK << 4 )
-                 {
-                     ReceiveSuback(receivePacket);
+                     case PacketType.CONNACK << 4:
+                         ReceiveConnAck(receivePacket);
+                         break;
+                     case PacketType.PUBACK << 4:
+                         ReceivePubAck(receivePacket);
+                         break;
+                     case PacketType.PUBREC << 4:
+                         ReceivePubRec(receivePacket);
+                         break;
+                     case PacketType.PUBREL << 4:
+                         ReceivePubRel(receivePacket);
+                         break;
+                     case PacketType.PUBCOMP << 4:
+                         ReceivePubComp(receivePacket);
+                         break;
+                     case PacketType.SUBACK << 4:
+                         ReceiveSuback(receivePacket);
+                         break;
+                     case PacketType.PINGRESP << 4:
+                         ReceivePingResp(receivePacket);
+                         break;
+                     case PacketType.PUBLISH << 4:
+                         ReceivePubAck(receivePacket); //todo
+                         break;
+                    
+                     case PacketType.UNSUBACK << 4:
+                         ReceiveSuback(receivePacket);
+                         break;
                  }
             }
             else

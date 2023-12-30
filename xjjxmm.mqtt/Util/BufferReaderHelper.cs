@@ -31,11 +31,11 @@ internal class BufferReaderHelper(ArraySegment<byte> bytes)
         return Encoding.UTF8.GetString(tmp.ToArray(), 0, tmp.Count);        
     }
     
-    public int NextTwoByteInt()
+    public ushort NextTwoByteInt()
     {
         var tmp = Next(2);
         var msb = tmp[0];
         var lsb = tmp[1];
-        return (msb << 8) | lsb;
+        return (ushort)((msb << 8) | lsb);
     }
 }

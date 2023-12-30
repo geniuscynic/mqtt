@@ -1,6 +1,7 @@
 ﻿using mqtt.server;
 using mqtt.server.Constant;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Channel;
 using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt;
@@ -13,9 +14,9 @@ public class MqttClient : IDisposable
 
     public Action<SubAckOption>? SubAckAction{ get; set; }
 
-    public Action<PingRespOption>? PingRespAction{ get; set; }
+    //public Action<PingRespOption>? PingRespAction{ get; set; }
 
-    public Action<PubAckOption>? PubAckAction{ get; set; }
+   // public Action<PubAckOption>? PubAckAction{ get; set; }
     
     public Action<PubRecOption>? PubRecAction{ get; set; }
     
@@ -32,7 +33,7 @@ public class MqttClient : IDisposable
     public async Task Connect(ConnectOption option)
     {
         _mqttChannel.ConnAckAction = ConnAckAction;
-        _mqttChannel.PingRespAction = PingRespAction;
+        _mqttChannel.PingRespAction = (option)=> Console.WriteLine( option.ToString());
         
         await _mqttChannel.SendConnect(option);
 
@@ -49,8 +50,27 @@ public class MqttClient : IDisposable
    
     public async Task Publish(PublishOption option)
     {
-        if (option.QoS == Qos.AtLeastOnce)
+        switch (option.QoS)
         {
+            case Qos.AtLeastOnce:
+                await PublishAtLeastOnce(option);
+                break;
+            case Qos.AtMostOnce:
+                await PublishAtMostOnce(option);
+                break;
+            case Qos.ExactlyOnce:
+                await PublishExactlyOnce(option);
+                break;
+        }
+    }
+
+    private async Task PublishAtMostOnce(PublishOption option)
+    {
+        await _mqttChannel.SendPublish(option);
+    }
+    
+    private async Task PublishAtLeastOnce(PublishOption option)
+    {
             _packetIdentifierProvider.Next();
             while (packetIdentifierHashSet.Contains(_packetIdentifierProvider.Current))
             {
@@ -58,25 +78,73 @@ public class MqttClient : IDisposable
             }
             packetIdentifierHashSet.Add(_packetIdentifierProvider.Current);
             option.PacketIdentifier = _packetIdentifierProvider.Current;            
-        }
-        
+            
         await _mqttChannel.SendPublish(option);
-
-        if (option.QoS == Qos.AtLeastOnce)
-        {
+        
+            _mqttChannel.PubAckAction = ackOption =>
+            {
+                packetIdentifierHashSet.Remove(ackOption.PacketIdentifier);
+            };
+            
             await Task.Delay(1000);
             // 重发
             while (packetIdentifierHashSet.Contains(option.PacketIdentifier))
             {
+                option.Dup = true;
                 await _mqttChannel.SendPublish(option);
                 await Task.Delay(1000);
             }
-        }
+    }
+    
+    private async Task PublishExactlyOnce(PublishOption option)
+    {
+        
+            _packetIdentifierProvider.Next();
+            while (packetIdentifierHashSet.Contains(_packetIdentifierProvider.Current))
+            {
+                _packetIdentifierProvider.Next();
+            }
+            packetIdentifierHashSet.Add(_packetIdentifierProvider.Current);
+            option.PacketIdentifier = _packetIdentifierProvider.Current;            
+            
+        await _mqttChannel.SendPublish(option);
 
-        _mqttChannel.PubAckAction = ackOption =>
-        {
-            packetIdentifierHashSet.Remove(ackOption.PacketIdentifier);
-        };
+        var packetIdentifier = 0;
+            _mqttChannel.PubRecAction = async ackOption =>
+            {
+                packetIdentifier = ackOption.PacketIdentifier;
+                //packetIdentifierHashSet.Remove(ackOption.PacketIdentifier);
+                await _mqttChannel.SendPubRel(new PubRelOption()
+                {
+                    PacketIdentifier = ackOption.PacketIdentifier
+                });
+
+            };
+            
+            _mqttChannel.PubCompAction = comOption =>
+            {
+                //packetIdentifierHashSet.Remove(ackOption.PacketIdentifier);
+                packetIdentifierHashSet.Remove(comOption.PacketIdentifier);
+
+            };
+        
+            await Task.Delay(1000);
+            // 重发
+            while (packetIdentifier == 0)
+            {
+                option.Dup = true;
+                await _mqttChannel.SendPublish(option);
+                await Task.Delay(1000);
+            }
+            
+            while (packetIdentifierHashSet.Contains(option.PacketIdentifier))
+            {
+                await _mqttChannel.SendPubRel(new PubRelOption()
+                {
+                    PacketIdentifier = packetIdentifier
+                });
+                await Task.Delay(1000);
+            }
     }
     
     public async Task Subscribe(SubscribeOption option)

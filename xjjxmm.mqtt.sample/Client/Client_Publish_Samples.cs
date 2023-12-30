@@ -9,7 +9,9 @@
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using mqtt.client.test;
+using mqtt.server.Constant;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.sample.Client;
 
@@ -23,10 +25,7 @@ public static class Client_Publish_Samples
             option.ToString().Dump();
         };
         
-        mqttClient.PingRespAction = option =>
-        {
-            option.ToString().Dump();
-        };
+       
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
@@ -35,6 +34,48 @@ public static class Client_Publish_Samples
         await mqttClient.Connect(mqttClientOptions);
         
         await mqttClient.Publish(new PublishOption("testTopic", "testMessage1"));
+    }
+    
+    public static async Task PublishQos1()
+    {
+        var mqttClient = new MqttClient();
+        mqttClient.ConnAckAction = option =>
+        {
+            option.ToString().Dump();
+        };
+      
+        
+        var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
+        {
+            CleanSession = false
+        };
+        await mqttClient.Connect(mqttClientOptions);
+        
+        await mqttClient.Publish(new PublishOption("testTopic", "testMessage1")
+        {
+            QoS = Qos.AtLeastOnce
+        });
+    }
+    
+    public static async Task PublishQos2()
+    {
+        var mqttClient = new MqttClient();
+        mqttClient.ConnAckAction = option =>
+        {
+            option.ToString().Dump();
+        };
+      
+        
+        var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
+        {
+            CleanSession = false
+        };
+        await mqttClient.Connect(mqttClientOptions);
+        
+        await mqttClient.Publish(new PublishOption("testTopic", "testMessage1")
+        {
+            QoS = Qos.ExactlyOnce
+        });
     }
     
 }

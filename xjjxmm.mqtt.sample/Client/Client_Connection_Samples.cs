@@ -10,6 +10,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using mqtt.client.test;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.sample.Client;
 
@@ -31,10 +32,7 @@ public static class Client_Connection_Samples
             option.ToString().Dump();
         };
         
-        mqttClient.PingRespAction = option =>
-        {
-            option.ToString().Dump();
-        };
+       
 
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")

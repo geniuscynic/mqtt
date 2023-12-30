@@ -1,10 +1,9 @@
-﻿using System.Net.NetworkInformation;
-using mqtt.server.Constant;
+﻿using mqtt.server.Constant;
 using mqtt.server.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class PingReqPacket : AbstractDataPacket
+internal class PingReqPacket : AbstractDataPacket<PingReqOption>
 {
     public PingReqPacket(PingReqOption options)
     {
@@ -32,7 +31,7 @@ internal class PingReqPacket : AbstractDataPacket
 
     }
 
-    public override IOption Decode()
+    public override PingReqOption Decode()
     {
         throw new NotImplementedException();
     }

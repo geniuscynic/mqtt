@@ -4,7 +4,7 @@ using mqtt.server.Packet;
 
 namespace xjjxmm.mqtt.Packet;
 
-internal class SubAckPacket : AbstractDataPacket
+internal class SubAckPacket : AbstractDataPacket<SubAckOption>
 {
     private readonly ReceivedPacket _buffer;
 
@@ -34,7 +34,7 @@ internal class SubAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode()
+    public override SubAckOption Decode()
     {
         var option = new SubAckOption();
         var readerHelper = _buffer.GetReaderHelper();

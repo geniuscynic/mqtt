@@ -1,8 +1,8 @@
 ﻿using mqtt.server.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class UnSubAckPacket : AbstractDataPacket
+internal class UnSubAckPacket : AbstractDataPacket<UnSubAckOption>
 {
     private readonly UnSubAckOption _option;
 
@@ -31,7 +31,7 @@ internal class UnSubAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode()
+    public override UnSubAckOption Decode()
     {
         throw new NotImplementedException();
     }

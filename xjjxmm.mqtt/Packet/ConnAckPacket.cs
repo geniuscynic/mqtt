@@ -1,9 +1,10 @@
-﻿using mqtt.server.Options;
+﻿using mqtt.server;
+using mqtt.server.Options;
 using xjjxmm.mqtt.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class ConnAckPacket : AbstractDataPacket
+internal class ConnAckPacket : AbstractDataPacket<ConnAckOption>
 {
     private readonly ReceivedPacket _buffer;
 
@@ -32,7 +33,7 @@ internal class ConnAckPacket : AbstractDataPacket
         throw new NotImplementedException();
     }
 
-    public override IOption Decode()
+    public override ConnAckOption Decode()
     {
         ConnAckOption option = new();
         var readerHelper = _buffer.GetReaderHelper();

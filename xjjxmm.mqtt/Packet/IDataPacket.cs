@@ -1,10 +1,10 @@
 ﻿using mqtt.server.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-interface IDataPacket
+interface IDataPacket<T> where T:IOption
 {
     ArraySegment<byte> Encode();
 
-    IOption Decode();
+    T Decode();
 }

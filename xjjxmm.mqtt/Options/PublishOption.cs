@@ -1,13 +1,14 @@
 ﻿using mqtt.server.Constant;
+using mqtt.server.Options;
 
-namespace mqtt.server.Options;
+namespace xjjxmm.mqtt.Options;
 
 /// <summary>
 /// todo: 缺少报文标识符 Packet Identifier
 /// </summary>
 /// <param name="TopicName"></param>
 /// <param name="Message"></param>
-public record PublishOption(string TopicName, string Message)
+public record PublishOption(string TopicName, string Message) : IOption
 {
     public bool Dup { get; set; } = false; //重发标志 DUP
 

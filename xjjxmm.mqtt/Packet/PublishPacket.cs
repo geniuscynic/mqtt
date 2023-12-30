@@ -3,10 +3,11 @@ using mqtt.server;
 using mqtt.server.Constant;
 using mqtt.server.Options;
 using mqtt.server.Packet;
+using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Packet;
 
-internal class PublishPacket(PublishOption publishOption) : AbstractDataPacket
+internal class PublishPacket(PublishOption publishOption) : AbstractDataPacket<PublishOption>
 {
     private readonly byte[] _subjectByte = publishOption.TopicName.ToBytes();
     private readonly byte[] _msgByte = publishOption.Message.ToBytes();
@@ -40,7 +41,7 @@ internal class PublishPacket(PublishOption publishOption) : AbstractDataPacket
             len += 2;
         }
 
-        foreach (var l in global::mqtt.client.test.UtilHelpers.ComputeRemainingLength(len))
+        foreach (var l in UtilHelpers.ComputeRemainingLength(len))
         {
             Data.Add(Convert.ToByte(l));
         }
@@ -68,7 +69,7 @@ internal class PublishPacket(PublishOption publishOption) : AbstractDataPacket
         Data.AddRange(_msgByte);
     }
 
-    public override IOption Decode()
+    public override PublishOption Decode()
     {
         throw new NotImplementedException();
     }

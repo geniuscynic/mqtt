@@ -1,10 +1,11 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Constant;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Options;
 
-namespace mqtt.server.Packet
+namespace xjjxmm.mqtt.Packet
 {
-    internal class ConnectPacket : AbstractDataPacket
+    internal class ConnectPacket : AbstractDataPacket<ConnectOption>
     {
         private readonly ConnectOption _connectOption;
         private readonly byte[] _clientByte;
@@ -121,7 +122,7 @@ namespace mqtt.server.Packet
             }
         }
 
-        public override IOption Decode()
+        public override ConnectOption Decode()
         {
             throw new NotImplementedException();
         }

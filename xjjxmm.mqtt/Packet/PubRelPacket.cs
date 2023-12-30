@@ -1,33 +1,36 @@
-﻿using mqtt.server.Constant;
+﻿using mqtt.server;
+using mqtt.server.Constant;
 using mqtt.server.Options;
+using mqtt.server.Packet;
+using xjjxmm.mqtt.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class PubRelPacket : AbstractDataPacket
+internal class PubRelPacket : AbstractDataPacket<PubRelOption>
 {
+    private readonly PubRelOption _option;
 
-    private readonly byte msb;
-    private readonly byte lsb;
+   
+    private readonly ReceivedPacket _buffer;
 
-    public PubRelPacket()
+    public PubRelPacket(ReceivedPacket buffer)
     {
-        
+        _buffer = buffer;
     }
     
-    public PubRelPacket(int packetIdentifier)
+    /*public PubRelPacket(int packetIdentifier)
     {
-        msb = (byte)(packetIdentifier >> 8);
-        lsb = (byte)(packetIdentifier & 255);
-    }
+       
+    }*/
 
     public PubRelPacket(PubRelOption option)
     {
-        
+        _option = option;
     }
 
     protected override void PushHeaders()
     {
-        var header = PacketType.PUBREL << 4;
+        var header = PacketType.PUBREL << 4 | 0x02;
 
         Data.Add(Convert.ToByte(header));
     }
@@ -40,10 +43,11 @@ internal class PubRelPacket : AbstractDataPacket
 
     protected override void PushVariableHeader()
     {
-
+        var msb = (byte)(_option.PacketIdentifier >> 8);
+        var lsb = (byte)(_option.PacketIdentifier & 255);
+        
         Data.Add(msb);
         Data.Add(lsb);
-
     }
 
 
@@ -53,8 +57,14 @@ internal class PubRelPacket : AbstractDataPacket
 
     }
 
-    public override IOption Decode()
+    public override PubRelOption Decode()
     {
-        throw new NotImplementedException();
+        var helper = _buffer.GetReaderHelper();
+        var packetIdentifier = helper.NextTwoByteInt();
+
+        return new PubRelOption()
+        {
+            PacketIdentifier = packetIdentifier
+        };
     }
 }

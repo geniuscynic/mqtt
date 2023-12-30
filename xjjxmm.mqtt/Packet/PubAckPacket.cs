@@ -2,12 +2,14 @@
 using mqtt.server.Constant;
 using mqtt.server.Options;
 using mqtt.server.Packet;
+using mqtt.server.Util;
 using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Packet;
 
-internal class PubAckPacket : AbstractDataPacket
+internal class PubAckPacket : AbstractDataPacket<PubAckOption>
 {
+    private readonly PubAckOption _option;
     private readonly ReceivedPacket _buffer;
     private readonly byte msb;
     private readonly byte lsb;
@@ -19,7 +21,7 @@ internal class PubAckPacket : AbstractDataPacket
 
     public PubAckPacket(PubAckOption option)
     {
-        
+        _option = option;
     }
     
     /*public PubAckPacket(int packetIdentifier)
@@ -51,8 +53,14 @@ internal class PubAckPacket : AbstractDataPacket
 
     }
 
-    public override IOption Decode()
+    public override PubAckOption Decode()
     {
-        return new PubAckOption();
+        var helper = _buffer.GetReaderHelper();
+        var packetIdentifier = helper.NextTwoByteInt();
+
+        return new PubAckOption
+        {
+            PacketIdentifier = packetIdentifier
+        };
     }
 }

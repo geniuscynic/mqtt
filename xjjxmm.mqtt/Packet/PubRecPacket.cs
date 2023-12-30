@@ -1,28 +1,29 @@
-﻿using mqtt.server.Constant;
+﻿using mqtt.server;
+using mqtt.server.Constant;
 using mqtt.server.Options;
+using mqtt.server.Packet;
+using xjjxmm.mqtt.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Packet;
 
-internal class PubRecPacket : AbstractDataPacket
+internal class PubRecPacket : AbstractDataPacket<PubRecOption>
 {
+    private readonly PubRecOption _option;
+    private readonly ReceivedPacket _buffer;
     private readonly byte msb;
     private readonly byte lsb;
 
-    public PubRecPacket()
+    public PubRecPacket(ReceivedPacket buffer)
     {
-        
+        _buffer = buffer;
     }
     
     public PubRecPacket(PubRecOption option)
     {
-        
+        _option = option;
     }
     
-    public PubRecPacket(int packetIdentifier)
-    {
-        msb = (byte)(packetIdentifier >> 8);
-        lsb = (byte)(packetIdentifier & 255);
-    }
+   
 
     protected override void PushHeaders()
     {
@@ -47,8 +48,14 @@ internal class PubRecPacket : AbstractDataPacket
 
     }
 
-    public override IOption Decode()
+    public override PubRecOption Decode()
     {
-        throw new NotImplementedException();
+        var helper = _buffer.GetReaderHelper();
+        var packetIdentifier = helper.NextTwoByteInt();
+
+        return new PubRecOption()
+        {
+            PacketIdentifier = packetIdentifier
+        };
     }
 }

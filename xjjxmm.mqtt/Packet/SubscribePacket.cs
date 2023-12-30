@@ -6,7 +6,7 @@ using mqtt.server.Packet;
 
 namespace xjjxmm.mqtt.Packet;
 
-internal class SubscribePacket : AbstractDataPacket
+internal class SubscribePacket : AbstractDataPacket<SubscribeOption>
 {
     private readonly SubscribeOption _subscribeOption;
     private readonly byte[] _subjectByte;
@@ -59,7 +59,7 @@ internal class SubscribePacket : AbstractDataPacket
         Data.Add(_subscribeOption.QoS);
     }
 
-    public override IOption Decode()
+    public override SubscribeOption Decode()
     {
         throw new NotImplementedException();
     }
