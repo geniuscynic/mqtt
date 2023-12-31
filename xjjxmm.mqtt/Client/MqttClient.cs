@@ -14,6 +14,8 @@ public class MqttClient : IDisposable
 
     public Action<SubAckOption>? SubAckAction{ get; set; }
 
+    public Action<PublishOption>? ReceiveMessage{ get; set; }
+    
     //public Action<PingRespOption>? PingRespAction{ get; set; }
 
    // public Action<PubAckOption>? PubAckAction{ get; set; }
@@ -34,6 +36,8 @@ public class MqttClient : IDisposable
     {
         _mqttChannel.ConnAckAction = ConnAckAction;
         _mqttChannel.PingRespAction = (option)=> Console.WriteLine( option.ToString());
+        _mqttChannel.SubAckAction = SubAckAction;
+        _mqttChannel.PublishAction = ReceiveMessage;
         
         await _mqttChannel.SendConnect(option);
 
@@ -47,7 +51,6 @@ public class MqttClient : IDisposable
         },  TaskCreationOptions.LongRunning);
     }
     
-   
     public async Task Publish(PublishOption option)
     {
         switch (option.QoS)

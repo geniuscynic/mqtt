@@ -1,7 +1,6 @@
-﻿using System.Net.Sockets;
-using System.Text;
+﻿using System.Text;
 
-namespace mqtt.server.Util;
+namespace xjjxmm.mqtt.Util;
 
 //https://zhuanlan.zhihu.com/p/653496155
 internal class BufferReaderHelper(ArraySegment<byte> bytes)
@@ -11,6 +10,15 @@ internal class BufferReaderHelper(ArraySegment<byte> bytes)
     public bool HasNext()
     {
         return pos < bytes.Count;
+    }
+   
+    public void Prev()
+    {
+        pos--;
+        if (pos < 0)
+        {
+            pos = 0;
+        }
     }
     
     public byte Next()
@@ -37,5 +45,11 @@ internal class BufferReaderHelper(ArraySegment<byte> bytes)
         var msb = tmp[0];
         var lsb = tmp[1];
         return (ushort)((msb << 8) | lsb);
+    }
+
+    public void Append(ArraySegment<byte> body)
+    {
+        bytes = bytes.Concat(body)
+                      .ToArray();
     }
 }

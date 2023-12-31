@@ -10,7 +10,9 @@ using xjjxmm.mqtt.sample.Client;
 
 
 //await Client_Connection_Samples.Connect_Client();
-await Client_Publish_Samples.PublishQos2();
+//await Client_Publish_Samples.PublishQos2();
+await Client_Subscribe_Samples.SubscribeQos0();
+
 
 Console.WriteLine("Hello, World!");
 Console.Read();

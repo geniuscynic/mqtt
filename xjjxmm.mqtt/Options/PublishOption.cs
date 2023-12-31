@@ -4,12 +4,15 @@ using mqtt.server.Options;
 namespace xjjxmm.mqtt.Options;
 
 /// <summary>
-/// todo: 缺少报文标识符 Packet Identifier
+/// 
 /// </summary>
 /// <param name="TopicName"></param>
 /// <param name="Message"></param>
-public record PublishOption(string TopicName, string Message) : IOption
+public class PublishOption : IOption
 {
+    public string TopicName { get; set; }
+    public string Message { get; set; }
+    
     public bool Dup { get; set; } = false; //重发标志 DUP
 
     public byte QoS { get; set; } = Qos.AtMostOnce; //服务质量等级 QoS 

@@ -3,6 +3,7 @@ using mqtt.server;
 using mqtt.server.Constant;
 using mqtt.server.Options;
 using mqtt.server.Packet;
+using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Packet;
 

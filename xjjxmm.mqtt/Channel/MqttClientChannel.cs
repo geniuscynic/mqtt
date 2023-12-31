@@ -19,6 +19,8 @@ internal class MqttChannel : IDisposable
 
     public Action<PingRespOption>? PingRespAction{ get; set; }
 
+    public Action<PublishOption>? PublishAction{ get; set; }
+    
     public Action<PubAckOption>? PubAckAction{ get; set; }
     
     public Func<PubRecOption, Task>? PubRecAction{ get; set; }
@@ -65,6 +67,12 @@ internal class MqttChannel : IDisposable
         await _socketClient.Send(new PublishPacket(option).Encode(), _cancellationTokenSource.Token);
     }
 
+    public void ReceivePublish(ReceivedPacket buffer)
+    {
+        var option = new PublishPacket(buffer).Decode();
+        PublishAction?.Invoke(option);
+    }
+    
     public async Task SendPubAck(PubAckOption option)
     {
         await _socketClient.Send(new PubAckPacket(option).Encode(), _cancellationTokenSource.Token);        
@@ -122,7 +130,7 @@ internal class MqttChannel : IDisposable
     
     public void ReceiveSuback(ReceivedPacket buffer)
     {
-        var option = (SubAckOption) new SubAckPacket(buffer).Decode();
+        var option =  new SubAckPacket(buffer).Decode();
         
         SubAckAction?.Invoke(option);
     }
@@ -154,12 +162,22 @@ internal class MqttChannel : IDisposable
             if (size > 0)
             {
                 var remainingLength = buffer[1];
+                
                 var body = await _socketClient.Receive(remainingLength);
                 var receivePacket = new ReceivedPacket(buffer[0], remainingLength, body);
+                if (receivePacket.RemainingLength > remainingLength)
+                {
+                    body = await _socketClient.Receive(receivePacket.RemainingLength - remainingLength);
+                    receivePacket.Append(body);
+                }
+                
                  switch (buffer[0])
                  {
                      case PacketType.CONNACK << 4:
                          ReceiveConnAck(receivePacket);
+                         break;
+                     case PacketType.PUBLISH << 4:
+                         ReceivePublish(receivePacket); 
                          break;
                      case PacketType.PUBACK << 4:
                          ReceivePubAck(receivePacket);
@@ -179,9 +197,7 @@ internal class MqttChannel : IDisposable
                      case PacketType.PINGRESP << 4:
                          ReceivePingResp(receivePacket);
                          break;
-                     case PacketType.PUBLISH << 4:
-                         ReceivePubAck(receivePacket); //todo
-                         break;
+                    
                     
                      case PacketType.UNSUBACK << 4:
                          ReceiveSuback(receivePacket);

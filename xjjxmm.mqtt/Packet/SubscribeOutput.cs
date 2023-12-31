@@ -1,6 +1,7 @@
 ﻿using mqtt.server;
 using mqtt.server.Options;
 using mqtt.server.Packet;
+using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Packet;
 
@@ -38,7 +39,8 @@ internal class SubAckPacket : AbstractDataPacket<SubAckOption>
     {
         var option = new SubAckOption();
         var readerHelper = _buffer.GetReaderHelper();
-        var ids = readerHelper.NextTwoByteInt();
+        var packetIdentifier = readerHelper.NextTwoByteInt();
+        option.PacketIdentifier = packetIdentifier;
         while (readerHelper.HasNext())
         {
             option.ReasonCodes.Add(readerHelper.Next());

@@ -7,10 +7,25 @@ using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Packet;
 
-internal class PublishPacket(PublishOption publishOption) : AbstractDataPacket<PublishOption>
+internal class PublishPacket : AbstractDataPacket<PublishOption>
 {
-    private readonly byte[] _subjectByte = publishOption.TopicName.ToBytes();
-    private readonly byte[] _msgByte = publishOption.Message.ToBytes();
+    private readonly PublishOption publishOption;
+    
+    private readonly byte[] _subjectByte;
+    private readonly byte[] _msgByte;
+    private readonly ReceivedPacket _buffer;
+
+    public PublishPacket(PublishOption publishOption)
+    {
+        this.publishOption = publishOption;
+        _subjectByte = publishOption.TopicName.ToBytes();
+        _msgByte = publishOption.Message.ToBytes();
+    }
+    
+    public PublishPacket(ReceivedPacket buffer)
+    {
+        _buffer = buffer;
+    }
     
     protected override void PushHeaders()
     {
@@ -71,6 +86,36 @@ internal class PublishPacket(PublishOption publishOption) : AbstractDataPacket<P
 
     public override PublishOption Decode()
     {
-        throw new NotImplementedException();
+        var option = new PublishOption();
+        
+        var helper = _buffer.GetReaderHelper();
+        var remainingLength = _buffer.RemainingLength;
+
+        var retain = (_buffer.Header & 0x01) == 0x01;
+        var qos = (_buffer.Header & 0x06) >> 1;
+        var dup = (_buffer.Header & 0x08) == 0x08;
+
+        var topicLength = helper.NextTwoByteInt();
+        var topic = helper.NextStr(topicLength);
+        
+        var  msgLength = remainingLength - topicLength - 2;
+        if (qos > 0)
+        {
+            var packetIdentifier = helper.NextTwoByteInt(); //只有当QoS等级是1或2时，报文标识符(Packet Identifier)字段才能出现在PUBLISH报文中
+            option.PacketIdentifier = packetIdentifier;
+            
+            msgLength -= 2;
+        }
+        
+        var msg = helper.NextStr(msgLength);
+        
+        return new PublishOption
+        {
+            TopicName = topic,
+            Message = msg,
+            Retain = retain,
+            QoS = (byte)qos,
+            Dup = dup 
+        };
     }
 }
