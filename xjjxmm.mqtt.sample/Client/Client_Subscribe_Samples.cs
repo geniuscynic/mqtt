@@ -42,4 +42,34 @@ option.Message.Dump();
         
         await mqttClient.Subscribe(new SubscribeOption("testTopic"));
     }
+    
+    public static async Task SubscribeQos1()
+    {
+        var mqttClient = new MqttClient();
+        
+        var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
+        {
+            CleanSession = true
+        };
+
+        mqttClient.SubAckAction = option =>
+        {
+            var identifier = option.PacketIdentifier;
+            var reason = option.ReasonCodes;
+        };
+
+
+        mqttClient.ReceiveMessage = option =>
+        {
+            option.Message.Dump();
+        };
+        
+        await mqttClient.Connect(mqttClientOptions);
+        
+        await mqttClient.Subscribe(new SubscribeOption("testTopic")
+        {
+            QoS = Qos.AtLeastOnce
+        });
+    }
+
 }

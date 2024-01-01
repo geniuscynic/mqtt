@@ -167,7 +167,7 @@ internal class MqttChannel : IDisposable
                 var receivePacket = new ReceivedPacket(buffer[0], remainingLength, body);
                 if (receivePacket.RemainingLength > remainingLength)
                 {
-                    body = await _socketClient.Receive(receivePacket.RemainingLength - remainingLength);
+                    body = await _socketClient.Receive(receivePacket.TotalLength - remainingLength);
                     receivePacket.Append(body);
                 }
                 
