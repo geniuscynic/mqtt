@@ -67,10 +67,26 @@ internal class MqttChannel : IDisposable
         await _socketClient.Send(new PublishPacket(option).Encode(), _cancellationTokenSource.Token);
     }
 
-    public void ReceivePublish(ReceivedPacket buffer)
+    public async Task ReceivePublish(ReceivedPacket buffer)
     {
         var option = new PublishPacket(buffer).Decode();
-        PublishAction?.Invoke(option);
+        if (option.QoS == Qos.AtMostOnce)
+        {
+            PublishAction?.Invoke(option);
+        }
+        else if (option.QoS == Qos.AtLeastOnce)
+        {
+            await SendPubAck(new PubAckOption()
+            {
+                PacketIdentifier = option.PacketIdentifier
+            });
+            PublishAction?.Invoke(option);
+        }
+        else if (option.QoS == Qos.AtMostOnce)
+        {
+            
+        }
+        
     }
     
     public async Task SendPubAck(PubAckOption option)
@@ -171,7 +187,7 @@ internal class MqttChannel : IDisposable
                     receivePacket.Append(body);
                 }
                 
-                 switch (buffer[0])
+                 switch (buffer[0] & 0xF0)
                  {
                      case PacketType.CONNACK << 4:
                          ReceiveConnAck(receivePacket);

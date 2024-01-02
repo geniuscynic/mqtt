@@ -108,14 +108,15 @@ internal class PublishPacket : AbstractDataPacket<PublishOption>
         }
         
         var msg = helper.NextStr(msgLength);
+
         
-        return new PublishOption
-        {
-            TopicName = topic,
-            Message = msg,
-            Retain = retain,
-            QoS = (byte)qos,
-            Dup = dup 
-        };
+        option.TopicName = topic;
+        option.Message = msg;
+        option.Retain = retain;
+        option.QoS = (byte)qos;
+        option.Dup = dup;
+        
+
+        return option;
     }
 }

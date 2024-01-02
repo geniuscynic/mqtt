@@ -19,7 +19,7 @@ public class PublishOption : IOption
 
     public bool Retain { get; set; } = false; //保留标志 RETAIN
 
-    public    int PacketIdentifier {get; set; }
+    public    ushort PacketIdentifier {get; set; }
     //报文标识符 Packet Identifier
 
     public override string ToString()

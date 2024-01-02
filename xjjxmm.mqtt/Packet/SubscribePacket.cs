@@ -12,17 +12,14 @@ internal class SubscribePacket : AbstractDataPacket<SubscribeOption>
     private readonly SubscribeOption _subscribeOption;
     private readonly byte[] _subjectByte;
 
-    private readonly byte msb;
-    private readonly byte lsb;
-
+  
     public SubscribePacket(SubscribeOption subscribeOption)
     {
         _subscribeOption = subscribeOption;
 
         _subjectByte = _subscribeOption.TopicName.ToBytes();
 
-        msb = UtilHelpers.RandomByte();
-        lsb = UtilHelpers.RandomByte();
+       
     }
 
     protected override void PushHeaders()
@@ -37,7 +34,7 @@ internal class SubscribePacket : AbstractDataPacket<SubscribeOption>
         //剩余长度（Remaining Length）表示当前报文剩余部分的字节数，包括可变报头和负载的数据。剩余长度不包括用于编码剩余长度字段本身的字节数。也就是剩余长度 = 可变报头 + 有效载荷。
         var len = 2 + 2 + _subjectByte.Length + 1;
 
-        foreach (var l in global::mqtt.client.test.UtilHelpers.ComputeRemainingLength(len))
+        foreach (var l in UtilHelpers.ComputeRemainingLength(len))
         {
             Data.Add(Convert.ToByte(l));
         }
@@ -45,6 +42,9 @@ internal class SubscribePacket : AbstractDataPacket<SubscribeOption>
 
     protected override void PushVariableHeader()
     {
+       var msb = UtilHelpers.RandomByte();
+       var lsb = UtilHelpers.RandomByte();
+        
         Data.Add(msb);
         Data.Add(lsb);
     }
