@@ -19,13 +19,13 @@ internal class MqttChannel : IDisposable
 
     public Action<PingRespOption>? PingRespAction{ get; set; }
 
-    public Action<PublishOption>? PublishAction{ get; set; }
+    public Func<PublishOption, Task>? PublishAction{ get; set; }
     
     public Action<PubAckOption>? PubAckAction{ get; set; }
     
     public Func<PubRecOption, Task>? PubRecAction{ get; set; }
     
-    public Action<PubRelOption>? PubRelAction{ get; set; }
+    public Func<PubRelOption, Task>? PubRelAction{ get; set; }
     
     public Action<PubCompOption>? PubCompAction{ get; set; }
     
@@ -67,10 +67,12 @@ internal class MqttChannel : IDisposable
         await _socketClient.Send(new PublishPacket(option).Encode(), _cancellationTokenSource.Token);
     }
 
-    public async Task ReceivePublish(ReceivedPacket buffer)
+    private async Task ReceivePublish(ReceivedPacket buffer)
     {
         var option = new PublishPacket(buffer).Decode();
-        if (option.QoS == Qos.AtMostOnce)
+        await PublishAction?.Invoke(option)!;
+        
+        /*if (option.QoS == Qos.AtMostOnce)
         {
             PublishAction?.Invoke(option);
         }
@@ -85,7 +87,7 @@ internal class MqttChannel : IDisposable
         else if (option.QoS == Qos.AtMostOnce)
         {
             
-        }
+        }*/
         
     }
     
@@ -123,6 +125,11 @@ internal class MqttChannel : IDisposable
     {
         var option = (PubRelOption) new PubRelPacket(buffer).Decode();
         PubRelAction?.Invoke(option);
+    }
+   
+    public async Task SendPubComp(PubCompOption option)
+    {
+        await _socketClient.Send(new PubCompPacket(option).Encode(), _cancellationTokenSource.Token);
     }
     
     public void ReceivePubComp(ReceivedPacket buffer)

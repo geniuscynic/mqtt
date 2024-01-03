@@ -20,13 +20,13 @@ public class MqttClient : IDisposable
 
    // public Action<PubAckOption>? PubAckAction{ get; set; }
     
-    public Action<PubRecOption>? PubRecAction{ get; set; }
+   // public Action<PubRecOption>? PubRecAction{ get; set; }
     
-    public Action<PubRelOption>? PubRelAction{ get; set; }
+   // public Action<PubRelOption>? PubRelAction{ get; set; }
     
-    public Action<PubCompOption>? PubCompAction{ get; set; }
+   // public Action<PubCompOption>? PubCompAction{ get; set; }
     
-    public Action<UnSubAckOption>? UnSubAckAction{ get; set; }
+   // public Action<UnSubAckOption>? UnSubAckAction{ get; set; }
 
     //private int publicIdentifier = 1;
     private HashSet<int> packetIdentifierHashSet = new();
@@ -37,8 +37,9 @@ public class MqttClient : IDisposable
         _mqttChannel.ConnAckAction = ConnAckAction;
         _mqttChannel.PingRespAction = (option)=> Console.WriteLine( option.ToString());
         _mqttChannel.SubAckAction = SubAckAction;
-        _mqttChannel.PublishAction = ReceiveMessage;
+        _mqttChannel.PublishAction = PublishAction;
         
+            
         await _mqttChannel.SendConnect(option);
 
         Task.Factory.StartNew(async () =>
@@ -154,7 +155,39 @@ public class MqttClient : IDisposable
     {
         await _mqttChannel.Subscribe(option);
     }
+
+    private async Task PublishAction(PublishOption option)
+    {
+        if (option.QoS == Qos.AtMostOnce)
+        {
+            ReceiveMessage?.Invoke(option);
+        }
+        else if (option.QoS == Qos.AtLeastOnce)
+        {
+            await _mqttChannel.SendPubAck(new PubAckOption()
+            {
+                PacketIdentifier = option.PacketIdentifier
+            });
+            ReceiveMessage?.Invoke(option);
+        }
+        else if (option.QoS == Qos.AtMostOnce)
+        {
+            await _mqttChannel.SendPubRec(new PubRecOption()
+            {
+                PacketIdentifier = option.PacketIdentifier
+            });
+
+            _mqttChannel.PubRelAction = async relOption =>
+            {
+                await _mqttChannel.SendPubComp(new PubCompOption()
+                {
+                    PacketIdentifier = relOption.PacketIdentifier
+                });
+            };
+        }
+    }
     
+
     public void Dispose()
     {
         //socket.Close();

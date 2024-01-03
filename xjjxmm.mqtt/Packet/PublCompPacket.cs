@@ -6,21 +6,18 @@ namespace xjjxmm.mqtt.Packet;
 
 internal class PubCompPacket : AbstractDataPacket<PubCompOption>
 {
-    private readonly byte msb;
-    private readonly byte lsb;
     private readonly ReceivedPacket _buffer;
-
-    public PubCompPacket(int packetIdentifier)
+    private readonly PubCompOption _option;
+    
+    public PubCompPacket(PubCompOption option)
     {
-        msb = (byte)(packetIdentifier >> 8);
-        lsb = (byte)(packetIdentifier & 255);
+        _option = option;
     }
-
+    
     public PubCompPacket(ReceivedPacket buffer)
     {
         _buffer = buffer;
     }
-
     
     protected override void PushHeaders()
     {
@@ -36,6 +33,8 @@ internal class PubCompPacket : AbstractDataPacket<PubCompOption>
 
     protected override void PushVariableHeader()
     {
+        var msb = (byte)(_option.PacketIdentifier >> 8);
+        var lsb = (byte)(_option.PacketIdentifier & 255);
         Data.Add(msb);
         Data.Add(lsb);
     }
