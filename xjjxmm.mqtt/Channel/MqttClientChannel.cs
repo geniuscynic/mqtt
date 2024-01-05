@@ -41,8 +41,7 @@ internal class MqttChannel : IDisposable
     {
         await _socketClient.Connect(option.Host, option.Port);
         await _socketClient.Send(new ConnectPacket(option).Encode(), _cancellationTokenSource.Token);
-
-        Receive();
+        //Receive();
     }
     
     private void ReceiveConnAck(ReceivedPacket buffer)

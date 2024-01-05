@@ -187,7 +187,6 @@ public class MqttClient : IDisposable
         }
     }
     
-
     public void Dispose()
     {
         //socket.Close();
