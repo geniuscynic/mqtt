@@ -2,6 +2,7 @@
 using mqtt.server.Options;
 using mqtt.server.Packet;
 using mqtt.server.Util;
+using xjjxmm.mqtt.Command;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
 
@@ -22,10 +23,15 @@ internal class MqttChannel2 : IDisposable
         await _socketClient.Connect(option.Host, option.Port);
     }
     
-    public async Task<ReceivedPacket> Send(ICommand command)
+    public async Task<ReceivedPacket> Send(ICommand command, int timeout = 1000 * 1)
     {
         _commands.Enqueue(command);
         await _socketClient.Send(command.Encode(), _cancellationTokenSource.Token);
+        
+        using var cts = new CancellationTokenSource();
+        cts.Token.Register(() => command.Result.TrySetException(new TimeoutException()), useSynchronizationContext: false);
+        cts.CancelAfter(timeout);
+        
         return await command.Result.Task;
     }
     

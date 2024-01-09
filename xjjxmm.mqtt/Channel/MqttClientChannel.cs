@@ -139,7 +139,7 @@ internal class MqttChannel : IDisposable
     
     private void ReceivePingResp(ReceivedPacket buffer)
     {
-        var option = (PingRespOption) new PingRespPacket().Decode();
+        var option = (PingRespOption) new PingRespPacket(buffer).Decode();
         PingRespAction?.Invoke(option);
     }
     

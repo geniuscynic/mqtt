@@ -5,6 +5,10 @@ namespace xjjxmm.mqtt.Packet;
 
 internal class PingRespPacket : AbstractDataPacket<PingRespOption>
 {
+    public PingRespPacket(ReceivedPacket packet)
+    {
+        
+    }
     protected override void PushHeaders()
     {
         throw new NotImplementedException();
