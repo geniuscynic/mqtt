@@ -8,7 +8,7 @@ using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Channel;
 
-internal class MqttClientChannel : IDisposable
+internal class MqttChannel : IDisposable
 {
     private SocketClient _socketClient;
 
@@ -31,13 +31,13 @@ internal class MqttClientChannel : IDisposable
     
     public Action<UnSubAckOption>? UnSubAckAction{ get; set; }
     
-    public MqttClientChannel()
+    public MqttChannel()
     {
         _socketClient = new SocketClient();
         //创建与远程主机的连接
     }
 
-    public async Task Connect(ConnectOption option)
+    public async Task SendConnect(ConnectOption option)
     {
         await _socketClient.Connect(option.Host, option.Port);
         await _socketClient.Send(new ConnectPacket(option).Encode(), _cancellationTokenSource.Token);

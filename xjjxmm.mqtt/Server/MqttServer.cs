@@ -1,14 +1,11 @@
-﻿using mqtt.server;
-using mqtt.server.Options;
-using mqtt.server.Packet;
-using mqtt.server.Util;
+﻿using mqtt.server.Util;
 using xjjxmm.mqtt.Command;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
 
-namespace xjjxmm.mqtt.Channel;
+namespace xjjxmm.mqtt.Server;
 
-internal class MqttChannel2 : IDisposable
+internal class MqttServer : IDisposable
 {
     private readonly SocketClient _socketClient = new();
 
@@ -18,10 +15,22 @@ internal class MqttChannel2 : IDisposable
     Queue<ICommand> _tmpCommands = new Queue<ICommand>();
     //创建与远程主机的连接
     
-    public async Task Connect(ConnectOption option)
+    public async Task Start()
     {
-        await _socketClient.Connect(option.Host, option.Port);
-        Receive();
+        await ClientConnected();
+    }
+        
+    private async Task ClientConnected()
+    {
+        while (true)
+        {
+            var client = await _server.Accept();
+            SocketInfo socketInfo = new SocketInfo();
+            _socketId++;
+            socketInfo.Id = _socketId;
+            socketInfo.Socket = client;
+            ReceiveMessage(socketInfo);
+        }
     }
     
     public async Task<ReceivedPacket> Send(ISendCommand command, int timeout = 1000 * 10)

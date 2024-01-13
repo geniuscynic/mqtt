@@ -4,7 +4,7 @@ using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Channel;
 
-internal abstract class BaseCommand : ICommand
+internal abstract class BaseCommand : ISendCommand
 {
     public abstract IOption Decode(ReceivedPacket data);
 
@@ -14,6 +14,5 @@ internal abstract class BaseCommand : ICommand
 
    
     public abstract byte? AcceptCommand { get; }
-    
-   
 }
+

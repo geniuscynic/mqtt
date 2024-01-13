@@ -104,3 +104,55 @@ internal class SubscribeCommand(SubscribeOption option) : BaseCommand
       return  new SubAckPacket(data).Decode();
     }
 }
+
+internal class ReceivePublishCommand : ICommand
+{
+    public IOption Decode(ReceivedPacket data)
+    {
+        return new PublishPacket(data).Decode();
+    }
+
+    public TaskCompletionSource<ReceivedPacket> Result { get; } = new();
+    public byte? AcceptCommand { get; } = PacketType.PUBLISH;
+}
+
+internal class PubAckCommand(PubAckOption option) : BaseCommand
+{
+    public override byte? AcceptCommand => null;
+
+    public override ArraySegment<byte> Encode()
+    {
+        return new PubAckPacket(option).Encode();
+    }
+    
+    public override IOption Decode(ReceivedPacket data)
+    {
+        return null;
+    }
+}
+
+internal class PubRecCommand(PubRecOption option) : BaseCommand {
+    public override byte? AcceptCommand => PacketType.PUBREL;
+    public override ArraySegment<byte> Encode()
+    {
+        return new PubRecPacket(option).Encode();
+    }
+    
+    public override IOption Decode(ReceivedPacket data)
+    {
+        return new PubRelPacket(data).Decode();
+    }
+}
+
+internal class PubCompCommand(PubCompOption option) : BaseCommand
+{
+    public override byte? AcceptCommand => null;
+    public override ArraySegment<byte> Encode()
+    {
+        return new PubCompPacket(option).Encode();
+    }
+    public override IOption Decode(ReceivedPacket data)
+    {
+        return null;
+    }
+}
