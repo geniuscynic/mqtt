@@ -1,5 +1,5 @@
 ﻿using mqtt.server.Options;
-using xjjxmm.mqtt.Packet;
+using xjjxmm.mqtt.MqttPacket;
 
 namespace xjjxmm.mqtt.Command;
 

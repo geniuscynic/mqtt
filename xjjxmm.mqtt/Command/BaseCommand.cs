@@ -1,6 +1,6 @@
 ﻿using mqtt.server.Options;
 using xjjxmm.mqtt.Command;
-using xjjxmm.mqtt.Packet;
+using xjjxmm.mqtt.MqttPacket;
 
 namespace xjjxmm.mqtt.Channel;
 

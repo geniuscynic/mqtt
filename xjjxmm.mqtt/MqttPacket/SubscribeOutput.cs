@@ -1,18 +1,17 @@
-﻿using mqtt.server;
-using mqtt.server.Options;
-using xjjxmm.mqtt.Options;
+﻿using xjjxmm.mqtt.Options;
 
-namespace xjjxmm.mqtt.Packet;
+namespace xjjxmm.mqtt.MqttPacket;
 
-internal class ConnAckPacket : AbstractDataPacket<ConnAckOption>
+internal class SubAckPacket : AbstractDataPacket<SubAckOption>
 {
     private readonly ReceivedPacket _buffer;
 
-    public ConnAckPacket(ReceivedPacket buffer)
+    public SubAckPacket(ReceivedPacket buffer)
     {
         _buffer = buffer;
     }
-    
+
+
     protected override void PushHeaders()
     {
         throw new NotImplementedException();
@@ -33,12 +32,13 @@ internal class ConnAckPacket : AbstractDataPacket<ConnAckOption>
         throw new NotImplementedException();
     }
 
-    public override ConnAckOption Decode()
+    public override SubAckOption Decode()
     {
-        ConnAckOption option = new();
+        var option = new SubAckOption();
         var readerHelper = _buffer.GetReaderHelper();
-        option.IsSessionPresent = readerHelper.Next() ==  1;
-        option.ReasonCode = readerHelper.Next();
+        var packetIdentifier = readerHelper.NextTwoByteInt();
+        option.PacketIdentifier = packetIdentifier;
+        while (readerHelper.HasNext()) option.ReasonCodes.Add(readerHelper.Next());
 
         return option;
     }

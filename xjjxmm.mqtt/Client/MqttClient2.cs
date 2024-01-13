@@ -3,7 +3,6 @@ using mqtt.server.Options;
 using xjjxmm.mqtt.Channel;
 using xjjxmm.mqtt.Command;
 using xjjxmm.mqtt.Options;
-using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Client;
 

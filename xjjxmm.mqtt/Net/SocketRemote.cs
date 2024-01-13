@@ -1,6 +1,4 @@
-﻿using mqtt.server;
-using mqtt.server.Options;
-using mqtt.server.Packet;
+﻿using mqtt.server.Constant;
 using xjjxmm.mqtt.Command;
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Net;
@@ -8,15 +6,14 @@ using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Channel;
 
-internal class MqttChannel2 : IDisposable
+internal class MqttClientChannel3 : IDisposable
 {
     private readonly SocketProxy _socketClient = new();
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
    
-    private readonly Queue<ICommand> _commands = new Queue<ICommand>();
-    Queue<ICommand> _tmpCommands = new Queue<ICommand>();
-    //创建与远程主机的连接
+    private readonly Dictionary<byte, Queue<PacketType>> _commands = new ();
+  
     
     public async Task Connect(ConnectOption option)
     {
@@ -24,21 +21,9 @@ internal class MqttChannel2 : IDisposable
         Receive();
     }
     
-    public async Task<ReceivedPacket> Send(ISendCommand command, int timeout = 1000 * 10)
+    public async Task Send(Packet packet)
     {
-        _commands.Enqueue(command);
-        await _socketClient.Send(command.Encode(), _cancellationTokenSource.Token);
-        
-        using var cts = new CancellationTokenSource();
-        cts.Token.Register(() => command.Result.TrySetException(new TimeoutException()), useSynchronizationContext: false);
-        cts.CancelAfter(timeout);
-        
-        return await command.Result.Task;
-    }
-    
-    public async Task SendNoAnswer(ISendCommand command)
-    {
-        await _socketClient.Send(command.Encode(), _cancellationTokenSource.Token);
+        await _socketClient.Send(packet.NextAll(), _cancellationTokenSource.Token);
     }
     
     public async Task<ReceivedPacket> ReceiveCommand(ICommand command)
@@ -48,7 +33,7 @@ internal class MqttChannel2 : IDisposable
         return await command.Result.Task;
     }
     
-     public async Task Receive()
+     private async Task Receive()
     {
         const int bufferSize = 2;
         ArraySegment<byte> buffer = new (new byte[bufferSize]);
@@ -69,27 +54,11 @@ internal class MqttChannel2 : IDisposable
                 }
                 
                 var commandName = receivePacket.GetCommandName();
-                while (_commands.Any())
+                if (!_commands.ContainsKey(commandName))
                 {
-                    var command = _commands.Dequeue();
-                    if (command.AcceptCommand == commandName )
-                    {
-                        Task.Run(()=>
-                        {
-                            command.Result.SetResult(receivePacket);
-                        });
-                        break;
-                    }
-                    else
-                    {
-                        _tmpCommands.Enqueue(command);
-                    }
+                    _commands.Add(commandName, new Queue<ReceivedPacket>());
                 }
-
-                while (_tmpCommands.Any())
-                {
-                    _commands.Enqueue(_tmpCommands.Dequeue());
-                }
+                _commands[commandName].Enqueue(receivePacket);
             }
             else
             {

@@ -1,17 +1,16 @@
 ﻿using mqtt.server.Options;
-using mqtt.server.Packet;
 
-namespace xjjxmm.mqtt.Packet;
+namespace xjjxmm.mqtt.MqttPacket;
 
-internal class UnSubscribePacket : AbstractDataPacket<UnSubscribeOption>
+internal class UnSubAckPacket : AbstractDataPacket<UnSubAckOption>
 {
-    private readonly UnSubscribeOption _option;
+    private readonly UnSubAckOption _option;
 
-    public UnSubscribePacket(UnSubscribeOption option)
+    public UnSubAckPacket(UnSubAckOption option)
     {
         _option = option;
     }
-    
+
     protected override void PushHeaders()
     {
         throw new NotImplementedException();
@@ -32,7 +31,7 @@ internal class UnSubscribePacket : AbstractDataPacket<UnSubscribeOption>
         throw new NotImplementedException();
     }
 
-    public override UnSubscribeOption Decode()
+    public override UnSubAckOption Decode()
     {
         throw new NotImplementedException();
     }

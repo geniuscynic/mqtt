@@ -1,20 +1,20 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace mqtt.server.Util
+namespace xjjxmm.mqtt.Net
 {
     //https://zhuanlan.zhihu.com/p/653496155
-    internal class SocketClient
+    internal class SocketProxy
     {
         private const int ChunkSize = 3;
         private readonly Socket _socket;
 
-        public SocketClient()
+        public SocketProxy()
         {
             _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         }
         
-        public SocketClient(Socket socket)
+        public SocketProxy(Socket socket)
         {
             _socket = socket;
         }
@@ -42,9 +42,9 @@ namespace mqtt.server.Util
         /// TCP专用，服务器等待客户端连接，一般是阻塞态
         /// </summary>
         /// <returns></returns>
-        public async Task<SocketClient> Accept()
+        public async Task<SocketProxy> Accept()
         {
-            return new  SocketClient(await _socket.AcceptAsync());
+            return new  SocketProxy(await _socket.AcceptAsync());
         }
        
         /// <summary>

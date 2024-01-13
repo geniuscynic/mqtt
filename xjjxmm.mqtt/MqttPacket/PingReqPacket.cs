@@ -1,14 +1,14 @@
 ﻿using mqtt.server.Constant;
 using mqtt.server.Options;
 
-namespace xjjxmm.mqtt.Packet;
+namespace xjjxmm.mqtt.MqttPacket;
 
 internal class PingReqPacket : AbstractDataPacket<PingReqOption>
 {
     public PingReqPacket(PingReqOption options)
     {
-        
     }
+
     protected override void PushHeaders()
     {
         byte header = PacketType.PINGREQ << 4;
@@ -23,12 +23,10 @@ internal class PingReqPacket : AbstractDataPacket<PingReqOption>
 
     protected override void PushVariableHeader()
     {
-
     }
 
     protected override void PushPayload()
     {
-
     }
 
     public override PingReqOption Decode()

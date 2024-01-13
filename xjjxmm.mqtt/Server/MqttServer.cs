@@ -1,13 +1,13 @@
-﻿using mqtt.server.Util;
-using xjjxmm.mqtt.Command;
+﻿using xjjxmm.mqtt.Command;
+using xjjxmm.mqtt.MqttPacket;
+using xjjxmm.mqtt.Net;
 using xjjxmm.mqtt.Options;
-using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Server;
 
 internal class MqttServer : IDisposable
 {
-    private readonly SocketClient _socketClient = new();
+    private readonly SocketProxy _socketClient = new();
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
    

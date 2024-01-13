@@ -1,24 +1,23 @@
-﻿using mqtt.server;
-using mqtt.server.Constant;
+﻿using mqtt.server.Constant;
 using mqtt.server.Options;
 
-namespace xjjxmm.mqtt.Packet;
+namespace xjjxmm.mqtt.MqttPacket;
 
 internal class PubCompPacket : AbstractDataPacket<PubCompOption>
 {
     private readonly ReceivedPacket _buffer;
     private readonly PubCompOption _option;
-    
+
     public PubCompPacket(PubCompOption option)
     {
         _option = option;
     }
-    
+
     public PubCompPacket(ReceivedPacket buffer)
     {
         _buffer = buffer;
     }
-    
+
     protected override void PushHeaders()
     {
         byte header = PacketType.PUBCOMP << 4;
@@ -41,7 +40,6 @@ internal class PubCompPacket : AbstractDataPacket<PubCompOption>
 
     protected override void PushPayload()
     {
-
     }
 
     public override PubCompOption Decode()
@@ -49,7 +47,7 @@ internal class PubCompPacket : AbstractDataPacket<PubCompOption>
         var helper = _buffer.GetReaderHelper();
         var packetIdentifier = helper.NextTwoByteInt();
 
-        return new PubCompOption()
+        return new PubCompOption
         {
             PacketIdentifier = packetIdentifier
         };

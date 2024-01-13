@@ -2,15 +2,15 @@
 using mqtt.server.Constant;
 using mqtt.server.Options;
 using mqtt.server.Packet;
-using mqtt.server.Util;
+using xjjxmm.mqtt.MqttPacket;
+using xjjxmm.mqtt.Net;
 using xjjxmm.mqtt.Options;
-using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Channel;
 
 internal class MqttChannel : IDisposable
 {
-    private SocketClient _socketClient;
+    private SocketProxy _socketClient;
 
     private CancellationTokenSource _cancellationTokenSource = new();
     public Action<ConnAckOption>? ConnAckAction { get; set; }
@@ -33,7 +33,7 @@ internal class MqttChannel : IDisposable
     
     public MqttChannel()
     {
-        _socketClient = new SocketClient();
+        _socketClient = new SocketProxy();
         //创建与远程主机的连接
     }
 
