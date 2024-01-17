@@ -1,10 +1,12 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Constant;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal abstract class AbstractDataPacket<T> : IDataPacket<T> where T : IOption
+internal abstract class AbstractDataPacket<T> : IDataPacket
 {
+   
     protected List<byte> Data { get; set; } = new();
 
     public ArraySegment<byte> Encode()
@@ -14,12 +16,12 @@ internal abstract class AbstractDataPacket<T> : IDataPacket<T> where T : IOption
         PushVariableHeader();
         PushPayload();
 
-        Data.Dump();
+        //Data.Dump();
 
         return Data.ToArray();
     }
 
-    public abstract T Decode();
+    public abstract IOption Decode();
 
     /// <summary>
     ///     固定报头
@@ -44,4 +46,6 @@ internal abstract class AbstractDataPacket<T> : IDataPacket<T> where T : IOption
     /// </summary>
     /// <returns></returns>
     protected abstract void PushPayload();
+
+    public abstract PacketType GetPacketType();
 }

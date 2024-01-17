@@ -1,18 +1,16 @@
 ﻿using mqtt.server.Options;
-using xjjxmm.mqtt.Command;
+using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
+using xjjxmm.mqtt.Net;
 
-namespace xjjxmm.mqtt.Channel;
+namespace xjjxmm.mqtt.Command;
 
-internal abstract class BaseCommand : ISendCommand
+internal abstract class BaseCommand(MqttChannel3 mqttChannel)
 {
-    public abstract IOption Decode(ReceivedPacket data);
-
-    public TaskCompletionSource<ReceivedPacket> Result { get; } = new();
+    public abstract Task Send(IOption option);
+    public abstract Task<IOption> GetResult();
     
-    public abstract ArraySegment<byte> Encode();
-
-   
-    public abstract byte? AcceptCommand { get; }
+    public TaskCompletionSource<ReceivedPacket> Result { get; } = new (TaskCreationOptions.RunContinuationsAsynchronously);
+    
 }
 

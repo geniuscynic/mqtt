@@ -2,6 +2,7 @@
 using mqtt.server.Constant;
 using mqtt.server.Options;
 using mqtt.server.Packet;
+using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Net;
 using xjjxmm.mqtt.Options;
@@ -63,12 +64,12 @@ internal class MqttClientChannel : IDisposable
     
     public async Task SendPublish(PublishOption option)
     {
-        await _socketClient.Send(new PublishPacket(option).Encode(), _cancellationTokenSource.Token);
+        await _socketClient.Send(new PublishPacket1(option).Encode(), _cancellationTokenSource.Token);
     }
 
     private async Task ReceivePublish(ReceivedPacket buffer)
     {
-        var option = new PublishPacket(buffer).Decode();
+        var option = new PublishPacket1(buffer).Decode();
         await PublishAction?.Invoke(option)!;
         
         /*if (option.QoS == Qos.AtMostOnce)

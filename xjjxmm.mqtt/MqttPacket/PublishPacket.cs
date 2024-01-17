@@ -1,10 +1,11 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Constant;
+using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class PublishPacket : AbstractDataPacket<PublishOption>
+internal class PublishPacket1 : AbstractDataPacket<PublishOption>
 {
     private readonly ReceivedPacket _buffer;
     private readonly byte[] _msgByte;
@@ -12,14 +13,14 @@ internal class PublishPacket : AbstractDataPacket<PublishOption>
     private readonly byte[] _subjectByte;
     private readonly PublishOption publishOption;
 
-    public PublishPacket(PublishOption publishOption)
+    public PublishPacket1(PublishOption publishOption)
     {
         this.publishOption = publishOption;
         _subjectByte = publishOption.TopicName.ToBytes();
         _msgByte = publishOption.Message.ToBytes();
     }
 
-    public PublishPacket(ReceivedPacket buffer)
+    public PublishPacket1(ReceivedPacket buffer)
     {
         _buffer = buffer;
     }

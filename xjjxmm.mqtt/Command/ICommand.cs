@@ -1,20 +1,23 @@
 ﻿using mqtt.server.Options;
+using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
 
 namespace xjjxmm.mqtt.Command;
 
 internal interface ICommand
 {
-   
-    IOption Decode(ReceivedPacket data);
+    Task Send(IOption option);
+    Task<IOption> GetResult();
+    Task SetResult(ReceivedPacket receivedPacket);
+    Task<bool> IsHandel(ReceivedPacket receivedPacket);
     
-    TaskCompletionSource<ReceivedPacket> Result { get; }
-    
-    public byte? AcceptCommand { get; }
+    //PacketType PacketType { get; }
+    //ArraySegment<byte> Encode();
 }
 
-internal interface ISendCommand : ICommand
+internal interface IReceiveCommand : ICommand
 {
-    ArraySegment<byte> Encode();
-
+    //public PacketType CommandPacketType { get; }
+    IOption Decode(ReceivedPacket data);
+    TaskCompletionSource<ReceivedPacket> Result { get; }
 }

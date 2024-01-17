@@ -1,17 +1,18 @@
 ﻿using mqtt.client.test;
 using mqtt.server.Constant;
+using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class ConnectPacket : AbstractDataPacket<ConnectOption>
+internal class ConnectPacket1 : AbstractDataPacket<ConnectOption>
 {
     private readonly byte[] _clientByte;
     private readonly ConnectOption _connectOption;
     private readonly byte[]? _passwordByte;
     private readonly byte[]? _userNameByte;
 
-    public ConnectPacket(ConnectOption connectOption)
+    public ConnectPacket1(ConnectOption connectOption)
     {
         _connectOption = connectOption;
 

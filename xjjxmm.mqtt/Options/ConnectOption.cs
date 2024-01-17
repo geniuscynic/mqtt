@@ -1,11 +1,11 @@
 ﻿using mqtt.server.Constant;
 using mqtt.server.Options;
+using xjjxmm.mqtt.MqttPacket;
 
 namespace xjjxmm.mqtt.Options
 {
-    public record ConnectOption(string Host, int Port, string ClientId) : IOption
+    public class ConnectOption(string Host, int Port, string ClientId) : IOption
     {
-        
         public byte ProtocolLevel { get; set; } = Protocol.Level3; //协议级别 
 
         public bool CleanSession { get; set; } = true; //清理会话
@@ -29,5 +29,11 @@ namespace xjjxmm.mqtt.Options
         public string Password { get; set; } = string.Empty;
 
         public int KeepAliveSecond { get; set; } = 60;
+
+
+        internal IDataPacket ToPacket()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

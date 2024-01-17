@@ -2,9 +2,9 @@
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal interface IDataPacket<T> where T : IOption
+internal interface IDataPacket : IPacket
 {
-    ArraySegment<byte> Encode();
+    ArraySegment<byte> Encode(IOption option);
 
-    T Decode();
+    IOption Decode(ReceivedPacket data);
 }
