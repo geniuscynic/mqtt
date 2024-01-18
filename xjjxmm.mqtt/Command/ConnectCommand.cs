@@ -30,6 +30,8 @@ internal enum CommandEnum
 {
     SendConnect,
     ReceiveConnect,
+    SendConnectAck,
+    ReceiveConnectAck,
     SendPublish,
     ReceivePublish,
     
@@ -61,7 +63,7 @@ internal class Command
     }
 }
 
-internal class ConnectCommand(MqttChannel3 mqttChannel,IPacket packet) : ICommand
+internal class SendConnectCommand(MqttChannel3 mqttChannel,IPacket packet) : ICommand
 {
     public async Task Send()
     {
@@ -69,7 +71,7 @@ internal class ConnectCommand(MqttChannel3 mqttChannel,IPacket packet) : IComman
         await mqttChannel.Send(packet.Encode());
     }
 
-    public Task<IOption> GetResult()
+    public Task<IPacket> GetResult()
     {
         throw new NotImplementedException();
     }
