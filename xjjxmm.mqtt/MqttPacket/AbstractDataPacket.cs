@@ -4,7 +4,9 @@ using xjjxmm.mqtt.Constant;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal abstract class AbstractDataPacket<T> : IDataPacket
+
+
+internal abstract class AbstractDataPacket
 {
    
     protected List<byte> Data { get; set; } = new();
@@ -21,7 +23,7 @@ internal abstract class AbstractDataPacket<T> : IDataPacket
         return Data.ToArray();
     }
 
-    public abstract IOption Decode();
+    //public abstract IOption Decode();
 
     /// <summary>
     ///     固定报头

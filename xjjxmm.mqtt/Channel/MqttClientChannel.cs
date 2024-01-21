@@ -1,7 +1,6 @@
 ﻿using mqtt.server;
 using mqtt.server.Constant;
 using mqtt.server.Options;
-using mqtt.server.Packet;
 using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Net;

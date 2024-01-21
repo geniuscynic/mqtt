@@ -1,87 +1,68 @@
 ﻿using System.Collections.Concurrent;
+using System.Windows.Input;
 using mqtt.server.Options;
 using xjjxmm.mqtt.Command;
+using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Service;
 
 namespace xjjxmm.mqtt.Net;
 
-interface IHandel
+internal class AwaitableMqttPacket(PacketType packet)
 {
-  
-    Task<IOption?> Handel(Command.Command command);
-}
+    public PacketType PacketType { get; } = packet;
 
-internal class SendConnectHandel : IHandel
-{
- 
-    public Task<IOption> Handel(Command.Command command)
+    private TaskCompletionSource<ReceivedPacket> _result  = new (TaskCreationOptions.RunContinuationsAsynchronously);
+
+    public async Task<ReceivedPacket> GetResult()
     {
-        if (command.Name == CommandEnum.SendConnect)
-        {
-            var service = new ConnectService();
-            await service.Send(command.Option);
-        }
-        else if (command.Name == CommandEnum.ReceiveConnect)
-        {
-            
-        }
-
-        return null;
+        return await _result.Task;
     }
-}
 
-internal class MqttPacketDispatcher
-{
-    private readonly List<IHandel> _handels = new();
-    private ConcurrentQueue<ICommand> _commands = new();
-    private ConcurrentQueue<ICommand> _tmpCommands = new();
-
-    private static readonly MqttPacketDispatcher _instance = new MqttPacketDispatcher();
-    public MqttPacketDispatcher Instance => _instance;
-
-    public void RegistHandel(IHandel handel)
+    public void SetResult(ReceivedPacket receivedPacket)
     {
-        _handels.Add(handel);
+        _result.SetResult(receivedPacket);
     }
     
-    public void Dispatch<IPacket> (Command.Command command)
+}
+
+internal class Dispatcher
+{
+    private Dispatcher() {}
+
+    public static Dispatcher Instance { get; } = new ();
+
+
+    private ConcurrentQueue<AwaitableMqttPacket> _commands = new();
+    private ConcurrentQueue<AwaitableMqttPacket> _tmpCommands = new();
+    public async Task<IPacketFactory?> AddEventHandel(PacketType packetType)
     {
-        foreach (var handel in _handels)
-        {
-            var packet = await handel.Handel(handel);
-            
-        }
-    }
-    
-    public void AddCommand(ICommand packet)
-    {
+        AwaitableMqttPacket packet = new AwaitableMqttPacket(packetType);
         _commands.Enqueue(packet);
+ 
+        var receivePacket =  await packet.GetResult();
+        return PacketFactory.PacketFactory.CreatePacketFactory(receivePacket);
     }
-
-    public async Task<bool> Dispatch(ReceivedPacket packet)
+    
+    public void Dispatch(ReceivedPacket packet)
     {
-        var exists = false;
-            ICommand command;
-            while (_commands.TryDequeue(out command))
+        AwaitableMqttPacket command;
+        while (_commands.TryDequeue(out command))
+        {
+            if (command.PacketType == packet.GetPacketType())
             {
-                if (await command.IsHandel(packet))
-                {
-                    exists = true;
-                    await command.SetResult(packet);
-                    break;
-                }
-                else
-                {
-                    _tmpCommands.Enqueue(command);
-                }
+                command.SetResult(packet);
+                break;
             }
-
-            while (_tmpCommands.TryDequeue(out command))
+            else
             {
-                _commands.Enqueue(command);
+                _tmpCommands.Enqueue(command);
             }
+        }
 
-            return exists;
+        while (_tmpCommands.TryDequeue(out command))
+        {
+            _commands.Enqueue(command);
+        }
     }
 }

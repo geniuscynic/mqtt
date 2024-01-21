@@ -4,7 +4,8 @@ using xjjxmm.mqtt.Constant;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class PingReqPacket : MqttPacket
+internal abstract class MqttPacket
 {
-   
+    
 }
+

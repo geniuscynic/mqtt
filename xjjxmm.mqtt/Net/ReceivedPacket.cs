@@ -83,13 +83,8 @@ internal class ReceivedPacket(SocketProxy socketProxy)
         return value;
     }
 
-    public IPacket Decode()
+    public PacketHelper GetPacketHelper()
     {
-        var packetType = GetPacketType();
-        return packetType switch
-        {
-            PacketType.Connect => new ConnectPacket().Decode(this),
-            _ => throw new NotSupportedException()
-        };
+        return _packetHelper;
     }
 }

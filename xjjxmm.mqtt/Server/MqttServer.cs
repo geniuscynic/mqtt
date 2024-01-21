@@ -5,9 +5,9 @@ using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.Server;
 
-internal class MqttServer : IDisposable
+internal class MqttServer //: IDisposable
 {
-    private readonly SocketProxy _socketClient = new();
+    /*private readonly SocketProxy _socketClient = new();
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
    
@@ -111,5 +111,5 @@ internal class MqttServer : IDisposable
      public void Dispose()
      {
          _socketClient.Close();
-     }
+     }*/
 }

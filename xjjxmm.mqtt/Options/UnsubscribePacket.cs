@@ -1,6 +1,6 @@
 ﻿using mqtt.server.Options;
 
-namespace mqtt.server.Packet;
+namespace xjjxmm.mqtt.Options;
 
 public class UnSubscribeOption : IOption
 {

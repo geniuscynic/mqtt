@@ -2,42 +2,15 @@
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class ConnAckPacket : AbstractDataPacket<ConnAckOption>
+internal class ConnAckPacket : MqttPacket
 {
-    private readonly ReceivedPacket _buffer;
+    public bool IsSessionPresent { get; set; }
+        
+    public byte ReasonCode { get; set; }
 
-    public ConnAckPacket(ReceivedPacket buffer)
+    public override string ToString()
     {
-        _buffer = buffer;
+        return $"ConnAck: [ReasonCode={ReasonCode}] [IsSessionPresent={IsSessionPresent}]";
     }
-
-    protected override void PushHeaders()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override void PushRemainingLength()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override void PushVariableHeader()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override void PushPayload()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override ConnAckOption Decode()
-    {
-        ConnAckOption option = new();
-        var readerHelper = _buffer.GetReaderHelper();
-        option.IsSessionPresent = readerHelper.Next() == 1;
-        option.ReasonCode = readerHelper.Next();
-
-        return option;
-    }
+    
 }
