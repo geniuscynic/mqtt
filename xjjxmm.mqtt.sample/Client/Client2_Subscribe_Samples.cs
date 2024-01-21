@@ -20,7 +20,7 @@ public static class Client2_Subscribe_Samples
 {
     public static async Task SubscribeQos0()
     {
-        var mqttClient = new MqttClient2();
+        var mqttClient = new MqttClient();
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
@@ -42,7 +42,7 @@ option.Dump();
     
     public static async Task SubscribeQos1()
     {
-        var mqttClient = new MqttClient2();
+        var mqttClient = new MqttClient();
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
@@ -64,7 +64,7 @@ option.Dump();
 
     public static async Task SubscribeQos2()
     {
-        var mqttClient = new MqttClient2();
+        var mqttClient = new MqttClient();
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {

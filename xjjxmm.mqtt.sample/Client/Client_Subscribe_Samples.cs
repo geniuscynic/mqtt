@@ -11,6 +11,7 @@ using System.Security.Cryptography.X509Certificates;
 using mqtt.client.test;
 using mqtt.server.Constant;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Client;
 using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.sample.Client;
@@ -26,7 +27,7 @@ public static class Client_Subscribe_Samples
             CleanSession = true
         };
 
-        mqttClient.SubAckAction = option =>
+        /*mqttClient.SubAckAction = option =>
         {
             var identifier = option.PacketIdentifier;
             var reason = option.ReasonCodes;
@@ -36,7 +37,7 @@ public static class Client_Subscribe_Samples
         mqttClient.ReceiveMessage = option =>
         {
 option.Message.Dump();
-        };
+        };*/
         
         await mqttClient.Connect(mqttClientOptions);
         
@@ -52,17 +53,19 @@ option.Message.Dump();
             CleanSession = true
         };
 
+        /*
         mqttClient.SubAckAction = option =>
         {
             var identifier = option.PacketIdentifier;
             var reason = option.ReasonCodes;
         };
+        */
 
 
-        mqttClient.ReceiveMessage = option =>
+        /*mqttClient.ReceiveMessage = option =>
         {
             option.Message.Dump();
-        };
+        };*/
         
         await mqttClient.Connect(mqttClientOptions);
         

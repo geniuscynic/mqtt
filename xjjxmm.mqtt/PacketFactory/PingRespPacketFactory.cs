@@ -17,7 +17,7 @@ internal class PingRespPacketFactory : IPacketFactory
       
     }
     
-    public PingRespPacketFactory(PingReqPacket option)
+    public PingRespPacketFactory(PingRespPacket option)
     {
         this.packet = option;
     }

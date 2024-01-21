@@ -22,7 +22,7 @@ internal class SubscribePacketFactory : IPacketFactory
       
     }
     
-    public PingReqPacketFactory(PingReqPacket option)
+    public SubscribePacketFactory(SubscribePacket option)
     {
         this.packet = option;
     }

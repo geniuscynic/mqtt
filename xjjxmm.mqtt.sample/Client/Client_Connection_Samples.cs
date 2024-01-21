@@ -10,6 +10,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using mqtt.client.test;
 using mqtt.server.Options;
+using xjjxmm.mqtt.Client;
 using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.sample.Client;
@@ -27,10 +28,10 @@ public static class Client_Connection_Samples
     public static async Task Connect_Client()
     {
         var mqttClient = new MqttClient();
-        mqttClient.ConnAckAction = option =>
+        /*mqttClient.ConnAckAction = option =>
         {
             option.ToString().Dump();
-        };
+        };*/
         
        
 

@@ -27,7 +27,7 @@ internal class UnSubAckPacketFactory : IPacketFactory
         };
     }
     
-    public PingReqPacketFactory(PingReqPacket option)
+    public UnSubAckPacketFactory(UnSubAckPacket option)
     {
         this.packet = option;
     }
