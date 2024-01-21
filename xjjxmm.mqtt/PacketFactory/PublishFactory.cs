@@ -9,7 +9,7 @@ namespace xjjxmm.mqtt.PacketFactory;
 internal class PublishPacketFactory : IPacketFactory
 {
     private readonly PublishPacket packet;
-    public PublishPacketFactory(PublishOption option)
+    public PublishPacketFactory(PublishOption option, ushort packetIdentifier)
     {
         packet = new PublishPacket
         {
@@ -18,7 +18,7 @@ internal class PublishPacketFactory : IPacketFactory
             Dup = option.Dup,
             QoS = option.QoS,
             Retain = option.Retain,
-            PacketIdentifier = option.PacketIdentifier
+            PacketIdentifier = packetIdentifier
         };
 
     }

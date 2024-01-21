@@ -2,8 +2,7 @@
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class UnSubAckPacket : MqttPacket
+internal class UnSubAckPacket : IdentifierPacket
 {
-    public int PacketIdentifier { get; set; }
-    
+  
 }

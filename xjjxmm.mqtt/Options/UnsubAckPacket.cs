@@ -2,5 +2,5 @@
 
 public class UnSubAckOption : IOption
 {
-    public int PacketIdentifier { get; set; }
+   // public ushort PacketIdentifier { get; set; }
 }

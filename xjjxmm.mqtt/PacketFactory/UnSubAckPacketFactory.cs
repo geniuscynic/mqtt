@@ -7,11 +7,11 @@ namespace xjjxmm.mqtt.PacketFactory;
 internal class UnSubAckPacketFactory : IPacketFactory
 {
     private readonly UnSubAckPacket packet;
-    public UnSubAckPacketFactory(UnSubAckOption option)
+    public UnSubAckPacketFactory(UnSubAckOption option, ushort packetIdentifier)
     {
         packet = new UnSubAckPacket()
         {
-            PacketIdentifier = option.PacketIdentifier
+            PacketIdentifier = packetIdentifier
         };
 
     }
@@ -77,7 +77,7 @@ internal class UnSubAckPacketFactory : IPacketFactory
     {
         return new UnSubAckOption()
         {
-            PacketIdentifier = packet.PacketIdentifier
+           // PacketIdentifier = packet.PacketIdentifier
         };
     }
 }

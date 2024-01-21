@@ -4,7 +4,7 @@ using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class PubRelPacket : MqttPacket
+internal class PubRelPacket : IdentifierPacket
 {
-    public int PacketIdentifier { get; set; }
+
 }

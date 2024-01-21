@@ -8,11 +8,11 @@ namespace xjjxmm.mqtt.PacketFactory;
 internal class PubRelPacketFactory : IPacketFactory
 {
     private readonly PubRelPacket packet;
-    public PubRelPacketFactory(PubRelOption option)
+    public PubRelPacketFactory(PubRelOption option, ushort packetIdentifier)
     {
         packet = new PubRelPacket
         {
-            PacketIdentifier = option.PacketIdentifier
+            PacketIdentifier = packetIdentifier
         };
 
     }
@@ -78,7 +78,7 @@ internal class PubRelPacketFactory : IPacketFactory
     {
         return new PubRelOption()
         {
-            PacketIdentifier = packet.PacketIdentifier
+           // PacketIdentifier = packet.PacketIdentifier
         };
     }
 }

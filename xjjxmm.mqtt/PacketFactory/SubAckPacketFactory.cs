@@ -6,11 +6,11 @@ namespace xjjxmm.mqtt.MqttPacket;
 internal class SubAckPacketFactory : IPacketFactory
 {
     private readonly SubAckPacket packet;
-    public SubAckPacketFactory(SubAckOption option)
+    public SubAckPacketFactory(SubAckOption option, ushort packetIdentifier)
     {
         packet = new SubAckPacket()
         {
-            PacketIdentifier = option.PacketIdentifier,
+            PacketIdentifier = packetIdentifier,
             ReasonCodes = option.ReasonCodes
         };
 
@@ -69,7 +69,7 @@ internal class SubAckPacketFactory : IPacketFactory
     {
         return new  SubAckOption()
         {
-            PacketIdentifier = packet.PacketIdentifier,
+            //PacketIdentifier = packet.PacketIdentifier,
             ReasonCodes = packet.ReasonCodes
         };
     }

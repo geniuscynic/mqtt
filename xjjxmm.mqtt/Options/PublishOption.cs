@@ -19,12 +19,7 @@ public class PublishOption : IOption
 
     public bool Retain { get; set; } = false; //保留标志 RETAIN
 
-    public    ushort PacketIdentifier {get; set; }
+    //public    ushort PacketIdentifier {get; set; }
     //报文标识符 Packet Identifier
-
-    public override string ToString()
-    {
-        return
-            $"Publish: [Topic={TopicName}] [QoSLevel={QoS}] [Dup={Dup}] [Retain={Retain}] [PacketIdentifier={PacketIdentifier}]";
-    }
+    
 }

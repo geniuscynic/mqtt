@@ -4,6 +4,6 @@ namespace mqtt.server.Options
 {
     public record PubCompOption : IOption
     {
-        public int PacketIdentifier { get; set; }
+       // public ushort PacketIdentifier { get; set; }
     }
 }

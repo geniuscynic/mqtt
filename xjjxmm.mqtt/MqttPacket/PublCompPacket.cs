@@ -4,7 +4,7 @@ using xjjxmm.mqtt.Constant;
 
 namespace xjjxmm.mqtt.MqttPacket;
 
-internal class PubCompPacket : MqttPacket
+internal class PubCompPacket : IdentifierPacket
 {
-    public int PacketIdentifier { get; set; }
+ 
 }

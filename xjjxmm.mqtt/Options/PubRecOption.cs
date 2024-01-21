@@ -4,6 +4,6 @@ namespace xjjxmm.mqtt.Options
 {
     public record PubRecOption : IOption
     {
-        public int PacketIdentifier { get; set; }
+        //public ushort PacketIdentifier { get; set; }
     }
 }

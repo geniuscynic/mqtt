@@ -5,9 +5,9 @@ using xjjxmm.mqtt.Options;
 
 namespace xjjxmm.mqtt.PacketFactory;
 
-internal class PacketFactory
+internal class PacketFactories
 {
-    public static IPacketFactory? CreatePacketFactory(IOption option)
+    public static IPacketFactory? CreatePacketFactory(IOption option, ushort packetIdentifier = 0)
     {
         return option switch
         {
@@ -16,14 +16,14 @@ internal class PacketFactory
             PingReqOption pingReqOption => new PingReqPacketFactory(pingReqOption),
             PingRespOption pingRespOption => new PingRespPacketFactory(pingRespOption),
             SubscribeOption subscribeOption => new SubscribePacketFactory(subscribeOption),
-            SubAckOption subAckOption => new SubAckPacketFactory(subAckOption),
+            SubAckOption subAckOption => new SubAckPacketFactory(subAckOption, packetIdentifier),
             UnSubscribeOption unSubscribeOption => new UnSubscribePacketFactory(unSubscribeOption),
-            UnSubAckOption unSubAckOption => new UnSubAckPacketFactory(unSubAckOption),
-            PublishOption publishOption => new PublishPacketFactory(publishOption),
-            PubAckOption pubAckOption => new PubAckPacketFactory(pubAckOption),
-            PubRecOption pubRecOption => new PubRecPacketFactory(pubRecOption),
-            PubRelOption pubRelOption => new PubRelPacketFactory(pubRelOption),
-            PubCompOption pubCompOption => new PubCompPacketFactory(pubCompOption),
+            UnSubAckOption unSubAckOption => new UnSubAckPacketFactory(unSubAckOption, packetIdentifier),
+            PublishOption publishOption => new PublishPacketFactory(publishOption, packetIdentifier),
+            PubAckOption pubAckOption => new PubAckPacketFactory(pubAckOption, packetIdentifier),
+            PubRecOption pubRecOption => new PubRecPacketFactory(pubRecOption, packetIdentifier),
+            PubRelOption pubRelOption => new PubRelPacketFactory(pubRelOption, packetIdentifier),
+            PubCompOption pubCompOption => new PubCompPacketFactory(pubCompOption, packetIdentifier),
             _ => null
         };
     }
@@ -106,6 +106,4 @@ internal class PacketFactory
 
         return null;
     }
-    
-    
 }

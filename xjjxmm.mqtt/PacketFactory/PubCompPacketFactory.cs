@@ -7,11 +7,11 @@ namespace xjjxmm.mqtt.PacketFactory;
 internal class PubCompPacketFactory : IPacketFactory
 {
     private readonly PubCompPacket packet;
-    public PubCompPacketFactory(PubCompOption option)
+    public PubCompPacketFactory(PubCompOption option, ushort packetIdentifier)
     {
         packet = new PubCompPacket
         {
-            PacketIdentifier = option.PacketIdentifier
+            PacketIdentifier = packetIdentifier
         };
 
     }
@@ -77,7 +77,7 @@ internal class PubCompPacketFactory : IPacketFactory
     {
         return new PubCompOption()
         {
-            PacketIdentifier = packet.PacketIdentifier
+           // PacketIdentifier = packet.PacketIdentifier
         };
     }
 }
