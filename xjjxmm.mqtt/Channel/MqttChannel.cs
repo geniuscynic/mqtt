@@ -1,5 +1,6 @@
 ﻿using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Net;
+using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Channel;
 

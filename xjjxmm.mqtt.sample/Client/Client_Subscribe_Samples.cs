@@ -10,7 +10,6 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using mqtt.client.test;
 using mqtt.server.Constant;
-using mqtt.server.Options;
 using xjjxmm.mqtt.Client;
 using xjjxmm.mqtt.Options;
 

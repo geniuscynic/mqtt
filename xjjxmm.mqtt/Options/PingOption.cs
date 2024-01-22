@@ -1,6 +1,4 @@
-﻿using mqtt.server.Constant;
-
-namespace mqtt.server.Options;
+﻿namespace xjjxmm.mqtt.Options;
 
 /// <summary>
 /// 

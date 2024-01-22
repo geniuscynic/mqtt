@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using xjjxmm.mqtt.Adapt;
+using xjjxmm.mqtt.Channel;
 using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
-using xjjxmm.mqtt.PacketFactory;
+using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Net;
 
@@ -10,14 +12,14 @@ internal class AwaitableMqttPacket(PacketType packet, ushort packetIdentifier )
     public ushort PacketIdentifier { get; } = packetIdentifier;
     public PacketType PacketType { get; } = packet;
 
-    private TaskCompletionSource<IPacketFactory> _result  = new (TaskCreationOptions.RunContinuationsAsynchronously);
+    private TaskCompletionSource<IAdaptFactory> _result  = new (TaskCreationOptions.RunContinuationsAsynchronously);
 
-    public async Task<IPacketFactory> GetResult()
+    public async Task<IAdaptFactory> GetResult()
     {
         return await _result.Task;
     }
 
-    public void SetResult(IPacketFactory receivedPacket)
+    public void SetResult(IAdaptFactory receivedPacket)
     {
         _result.SetResult(receivedPacket);
     }
@@ -26,14 +28,17 @@ internal class AwaitableMqttPacket(PacketType packet, ushort packetIdentifier )
 
 internal class Dispatcher
 {
-    private Dispatcher() {}
+    private readonly MqttChannel _mqttChannel;
+    public Dispatcher(MqttChannel mqttChannel)
+    {
+        _mqttChannel = mqttChannel;
+    }
 
-    public static Dispatcher Instance { get; } = new ();
-
+   
 
     private ConcurrentQueue<AwaitableMqttPacket> _commands = new();
     private ConcurrentQueue<AwaitableMqttPacket> _tmpCommands = new();
-    public async Task<IPacketFactory?> AddEventHandel(IPacketFactory packetFactory, PacketType packetType)
+    public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, PacketType packetType)
     {
         var packet = packetFactory.GetPacket();
         ushort packetIdentifier = 0;
@@ -44,7 +49,9 @@ internal class Dispatcher
         
         AwaitableMqttPacket awaitableMqttPacket = new AwaitableMqttPacket(packetType, packetIdentifier);
         _commands.Enqueue(awaitableMqttPacket);
- 
+
+        await _mqttChannel.Send(packetFactory.Encode());
+        
         var receivePacket =  await awaitableMqttPacket.GetResult();
         return receivePacket;
     }
@@ -56,7 +63,7 @@ internal class Dispatcher
         {
             if (command.PacketType == packet.GetPacketType())
             {
-                var packetFactory =  PacketFactories.CreatePacketFactory(packet);
+                var packetFactory =  Adapt.AdaptFactory.CreatePacketFactory(packet);
                 var mqttPacket = packetFactory!.GetPacket();
                 if (mqttPacket is IdentifierPacket identifierPacket)
                 {
