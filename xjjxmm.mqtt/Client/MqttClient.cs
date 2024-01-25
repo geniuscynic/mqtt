@@ -26,8 +26,7 @@ public class MqttClient : IDisposable
     public async Task<ConnAckOption> Connect(ConnectOption option)
     {
         _mqttChannel.Received = Receive;
-
-
+        
         //var command = Command.Command.Create(CommandEnum.SendConnect, option);
         var packetFactory = AdaptFactory.CreatePacketFactory(option);
         await _mqttChannel.Connect((ConnectPacket)packetFactory!.GetPacket());
@@ -41,7 +40,7 @@ public class MqttClient : IDisposable
             _mqttChannel.Dispose();
         }
 
-        Ping(option.KeepAliveSecond * 1000);
+        //Ping(option.KeepAliveSecond * 1000);
 
         return connAck;
     }
@@ -185,7 +184,7 @@ public class MqttClient : IDisposable
                 await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRec);
                 break;
             }
-            catch
+            catch(Exception ex)
             {
                 var publishPack = (PublishPacket)packetFactory!.GetPacket();
                 publishPack.Dup = true;

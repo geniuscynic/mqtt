@@ -17,7 +17,7 @@ internal class ReceivedPacket(SocketProxy socketProxy)
 
     public PacketType GetPacketType()
     {
-        var header = Header & 0xF0;
+        var header = (Header & 0xF0) >> 4;
         return Enum.Parse<PacketType>(header.ToString());
     }
 

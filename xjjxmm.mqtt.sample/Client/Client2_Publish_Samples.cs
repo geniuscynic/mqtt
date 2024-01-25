@@ -62,7 +62,7 @@ public static class Client2_Publish_Samples
         {
             CleanSession = false
         };
-        await mqttClient.Connect(mqttClientOptions);
+        var connAckOption = await mqttClient.Connect(mqttClientOptions);
         
         await mqttClient.Publish(new PublishOption
         {
