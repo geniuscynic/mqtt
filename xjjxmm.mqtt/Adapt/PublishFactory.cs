@@ -6,10 +6,10 @@ using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Adapt;
 
-internal class PublishPacketFactory : IAdaptFactory
+internal class PublishPacketAdapt : IAdaptFactory
 {
     private readonly PublishPacket packet;
-    public PublishPacketFactory(PublishOption option, ushort packetIdentifier)
+    public PublishPacketAdapt(PublishOption option, ushort packetIdentifier)
     {
         packet = new PublishPacket
         {
@@ -23,15 +23,16 @@ internal class PublishPacketFactory : IAdaptFactory
 
     }
     
-    public PublishPacketFactory(ReceivedPacket received)
+    public PublishPacketAdapt(ReceivedPacket received)
     {
+        packet = new PublishPacket();
         
         var helper = received.GetPacketHelper();
-        var remainingLength = _buffer.RemainingLength;
+        var remainingLength = received.RemainingLength;
 
-        var retain = (_buffer.Header & 0x01) == 0x01;
-        var qos = (_buffer.Header & 0x06) >> 1;
-        var dup = (_buffer.Header & 0x08) == 0x08;
+        var retain = (received.Header & 0x01) == 0x01;
+        var qos = (received.Header & 0x06) >> 1;
+        var dup = (received.Header & 0x08) == 0x08;
 
         var topicLength = helper.NextTwoByteInt();
         var topic = helper.NextStr(topicLength);
@@ -47,7 +48,7 @@ internal class PublishPacketFactory : IAdaptFactory
 
         var msg = helper.NextStr(msgLength);
 
-
+       
         packet.TopicName = topic;
         packet.Message = msg;
         packet.Retain = retain;
@@ -56,7 +57,7 @@ internal class PublishPacketFactory : IAdaptFactory
         
     }
     
-    public PublishPacketFactory(PublishPacket option)
+    public PublishPacketAdapt(PublishPacket option)
     {
         this.packet = option;
     }
@@ -68,7 +69,7 @@ internal class PublishPacketFactory : IAdaptFactory
 
     private List<byte> Data { get; } = new List<byte>();
     
-    private ReceivedPacket _buffer;
+    
     private byte[] _msgByte;
 
     private byte[] _subjectByte;
@@ -76,6 +77,9 @@ internal class PublishPacketFactory : IAdaptFactory
 
     protected void PushHeaders()
     {
+        _subjectByte = packet.TopicName.ToBytes();
+        _msgByte = packet.Message.ToBytes();
+        
         var header = (byte)PacketType.Publish << 4;
 
         if (packet.Dup) header |= 0x01 << 3;
@@ -93,7 +97,10 @@ internal class PublishPacketFactory : IAdaptFactory
         var len = 2 + _subjectByte.Length + _msgByte.Length;
         if (packet.QoS > 0) len += 2;
 
-        foreach (var l in UtilHelpers.ComputeRemainingLength(len)) Data.Add(Convert.ToByte(l));
+        foreach (var l in UtilHelpers.ComputeRemainingLength(len))
+        {
+            Data.Add(Convert.ToByte(l));
+        }
     }
 
     protected void PushVariableHeader()

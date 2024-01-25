@@ -9,12 +9,13 @@ namespace xjjxmm.mqtt.Adapt;
 internal class SubscribePacketAdapt : IAdaptFactory
 {
     private readonly SubscribePacket packet;
-    public SubscribePacketAdapt(SubscribeOption option)
+    public SubscribePacketAdapt(SubscribeOption option,ushort packetIdentifier)
     {
         packet = new SubscribePacket()
         {
             TopicName = option.TopicName,
-            QoS = option.QoS
+            QoS = option.QoS,
+            PacketIdentifier = packetIdentifier
         };
     }
     
@@ -53,9 +54,8 @@ internal class SubscribePacketAdapt : IAdaptFactory
 
     protected void PushVariableHeader()
     {
-        var msb = UtilHelpers.RandomByte();
-        var lsb = UtilHelpers.RandomByte();
-
+        var msb = (byte)(packet.PacketIdentifier >> 8);
+        var lsb = (byte)(packet.PacketIdentifier & 255);
         Data.Add(msb);
         Data.Add(lsb);
     }

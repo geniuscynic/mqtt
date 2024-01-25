@@ -1,6 +1,6 @@
 ﻿namespace xjjxmm.mqtt.Packet;
 
-internal class SubscribePacket : MqttPacket
+internal class SubscribePacket : IdentifierPacket
 {
     public string TopicName { get; set; }
     

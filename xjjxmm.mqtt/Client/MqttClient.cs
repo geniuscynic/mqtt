@@ -202,10 +202,12 @@ public class MqttClient : IDisposable
 
     public async Task<SubAckOption> Subscribe(SubscribeOption option)
     {
-        var packetFactory = Adapt.AdaptFactory.CreatePacketFactory(option);
+        _packetIdentifierProvider.Next();
+        var packetIdentifier = _packetIdentifierProvider.Current;
+        var packetFactory = AdaptFactory.CreatePacketFactory(option, packetIdentifier);
 
-        await _mqttChannel.Send(packetFactory.Encode());
-        packetFactory = await _dispatcher.AddEventHandel(packetFactory, PacketType.Subscribe);
+        //await _mqttChannel.Send(packetFactory!.Encode());
+        packetFactory = await _dispatcher.AddEventHandel(packetFactory!, PacketType.SubAck);
 
         var subAckOption = (SubAckOption)packetFactory!.GetOption();
 

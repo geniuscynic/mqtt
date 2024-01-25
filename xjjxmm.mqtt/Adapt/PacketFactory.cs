@@ -15,11 +15,11 @@ internal class AdaptFactory
             ConnAckOption connAckOption => new ConnAckPacketAdapt(connAckOption),
             PingReqOption pingReqOption => new PingReqPacketAdapt(pingReqOption),
             PingRespOption pingRespOption => new PingRespPacketAdapt(pingRespOption),
-            SubscribeOption subscribeOption => new SubscribePacketAdapt(subscribeOption),
+            SubscribeOption subscribeOption => new SubscribePacketAdapt(subscribeOption, packetIdentifier),
             SubAckOption subAckOption => new SubAckPacketAdapt(subAckOption, packetIdentifier),
             UnSubscribeOption unSubscribeOption => new UnSubscribePacketAdapt(unSubscribeOption),
             UnSubAckOption unSubAckOption => new UnSubAckPacketAdapt(unSubAckOption, packetIdentifier),
-            PublishOption publishOption => new PublishPacketFactory(publishOption, packetIdentifier),
+            PublishOption publishOption => new PublishPacketAdapt(publishOption, packetIdentifier),
             PubAckOption pubAckOption => new PubAckPacketAdapt(pubAckOption, packetIdentifier),
             PubRecOption pubRecOption => new PubRecPacketAdapt(pubRecOption, packetIdentifier),
             PubRelOption pubRelOption => new PubRelPacketAdapt(pubRelOption, packetIdentifier),
@@ -40,7 +40,7 @@ internal class AdaptFactory
             SubAckPacket subAckOption => new SubAckPacketAdapt(subAckOption),
             UnSubscribePacket unSubscribeOption => new UnSubscribePacketAdapt(unSubscribeOption),
             UnSubAckPacket unSubAckOption => new UnSubAckPacketAdapt(unSubAckOption),
-            PublishPacket publishOption => new PublishPacketFactory(publishOption),
+            PublishPacket publishOption => new PublishPacketAdapt(publishOption),
             PubAckPacket pubAckOption => new PubAckPacketAdapt(pubAckOption),
             PubRecPacket pubRecOption => new PubRecPacketAdapt(pubRecOption),
             PubRelPacket pubRelOption => new PubRelPacketAdapt(pubRelOption),
@@ -85,7 +85,7 @@ internal class AdaptFactory
         }
         else if (receivedPacket.GetPacketType() == PacketType.Publish)
         {
-            return new PublishPacketFactory(receivedPacket);
+            return new PublishPacketAdapt(receivedPacket);
         }
         else if (receivedPacket.GetPacketType() == PacketType.PubAck)
         {

@@ -25,13 +25,10 @@ public static class Client2_Subscribe_Samples
         {
             CleanSession = true
         };
-
-      
-
-
+        
         mqttClient.ReceiveMessage = option =>
         {
-//option.Dump();
+option.Message.Dump();
         };
         
         await mqttClient.Connect(mqttClientOptions);
@@ -50,7 +47,7 @@ public static class Client2_Subscribe_Samples
 
         mqttClient.ReceiveMessage = option =>
         {
-            //option.Dump();
+            option.Message.Dump();
         };
         
         await mqttClient.Connect(mqttClientOptions);
@@ -72,14 +69,15 @@ public static class Client2_Subscribe_Samples
 
         mqttClient.ReceiveMessage = option =>
         {
-            //option.Dump();
+            option.Message.Dump();
+            
         };
         
         await mqttClient.Connect(mqttClientOptions);
         
         var rep = await mqttClient.Subscribe(new SubscribeOption("testTopic")
         {
-            QoS = Qos.AtMostOnce
+            QoS = Qos.ExactlyOnce
         });
         
         //rep.ReasonCodes.Dump();

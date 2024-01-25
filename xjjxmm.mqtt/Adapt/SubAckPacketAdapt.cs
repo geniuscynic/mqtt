@@ -24,6 +24,8 @@ internal class SubAckPacketAdapt : IAdaptFactory
         var packetIdentifier = readerHelper.NextTwoByteInt();
         option.PacketIdentifier = packetIdentifier;
         while (readerHelper.HasNext()) option.ReasonCodes.Add(readerHelper.Next());
+
+        this.packet = option;
     }
     
     public SubAckPacketAdapt(SubAckPacket option)
