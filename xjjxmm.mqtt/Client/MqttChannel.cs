@@ -4,7 +4,7 @@ using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Channel;
 
-internal class MqttChannel : IDisposable
+internal class MqttClientChannel : IDisposable
 {
     private readonly SocketProxy _socketClient = new();
 
@@ -29,6 +29,7 @@ internal class MqttChannel : IDisposable
     {
         while (true)
         {
+
             var receivePacket = new ReceivedPacket(_socketClient);
             var size = await receivePacket.Receive(); 
             if (size > 0)
