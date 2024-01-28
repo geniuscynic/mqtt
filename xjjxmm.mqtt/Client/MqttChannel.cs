@@ -2,22 +2,25 @@
 using xjjxmm.mqtt.Net;
 using xjjxmm.mqtt.Packet;
 
-namespace xjjxmm.mqtt.Channel;
+namespace xjjxmm.mqtt.Client;
 
-internal class MqttClientChannel : IDisposable
+internal class MqttChannel : IDisposable
 {
-    private readonly SocketProxy _socketClient = new();
+    private readonly SocketProxy _socketClient;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-   
-    //private readonly Dictionary<PacketType, Queue<ReceivedPacket>> _commands = new ();
+    private readonly Func<ReceivedPacket, Task> _received;
     
-    public Func<ReceivedPacket, Task>?  Received { get; set; }
+    public MqttChannel(SocketProxy socketClient, Func<ReceivedPacket, Task>  received)
+    {
+        _socketClient = socketClient;
+        _received = received;
+        Receive();
+    }
     
     public async Task Connect(ConnectPacket packet)
     {
         await _socketClient.Connect(packet.Host, packet.Port);
-        Receive();
     }
     
     public async Task Send(ArraySegment<byte> bytes)
@@ -25,18 +28,17 @@ internal class MqttClientChannel : IDisposable
         await _socketClient.Send(bytes, _cancellationTokenSource.Token);
     }
     
-     private async Task Receive()
+    private async Task Receive()
     {
         while (true)
         {
-
             var receivePacket = new ReceivedPacket(_socketClient);
             var size = await receivePacket.Receive(); 
             if (size > 0)
             {
-                if (Received != null)
+                if (_received != null)
                 {
-                   Received.Invoke(receivePacket);
+                   _received.Invoke(receivePacket);
                 }
             }
             else

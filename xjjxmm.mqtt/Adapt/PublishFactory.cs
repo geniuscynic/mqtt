@@ -15,9 +15,9 @@ internal class PublishPacketAdapt : IAdaptFactory
         {
             TopicName = option.TopicName,
             Message = option.Message,
-            Dup = option.Dup,
+            //Dup = option.Dup,
             QoS = option.QoS,
-            Retain = option.Retain,
+            //Retain = option.Retain,
             PacketIdentifier = packetIdentifier
         };
 

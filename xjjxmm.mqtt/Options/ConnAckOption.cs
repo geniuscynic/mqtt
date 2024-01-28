@@ -1,10 +1,12 @@
-﻿namespace xjjxmm.mqtt.Options
+﻿using xjjxmm.mqtt.Constant;
+
+namespace xjjxmm.mqtt.Options
 {
     public record ConnAckOption : IOption
     {
         public bool IsSessionPresent { get; set; }
         
-        public byte ReasonCode { get; set; }
+        public ConnectReturnCode ReasonCode { get; set; }
 
         public override string ToString()
         {

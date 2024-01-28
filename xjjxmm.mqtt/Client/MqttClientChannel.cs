@@ -5,27 +5,27 @@ using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Net;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
+using xjjxmm.mqtt.Server;
 
 namespace xjjxmm.mqtt.Client;
 
-public class MqttClient : IDisposable
+internal class MqttClientChannel : IDisposable
 {
     private readonly MqttChannel _mqttChannel;
     private readonly Dispatcher _dispatcher;
-    public Action<ReceiveOption>? ReceiveMessage { get; set; }
+    public Func<Packet.MqttPacket, Task> ReceiveMessage { get; set; }
    // private readonly HashSet<int> _packetIdentifierHashSet = new();
     private readonly PacketIdentifierProvider _packetIdentifierProvider = new();
 
-    public MqttClient()
+    public MqttClientChannel(SocketProxy socketClient )
     {
-        _mqttChannel = new MqttChannel();
+       // SocketProxy socketClient = new SocketProxy();
+        _mqttChannel = new MqttChannel(socketClient, Receive);
         _dispatcher = new Dispatcher(_mqttChannel);
     }
 
     public async Task<ConnAckOption> Connect(ConnectOption option)
     {
-        _mqttChannel.Received = Receive;
-        
         //var command = Command.Command.Create(CommandEnum.SendConnect, option);
         var packetFactory = AdaptFactory.CreatePacketFactory(option);
         await _mqttChannel.Connect((ConnectPacket)packetFactory!.GetPacket());
@@ -48,14 +48,58 @@ public class MqttClient : IDisposable
     private async Task Receive(ReceivedPacket receivedPacket)
     {
         var packetType = receivedPacket.GetPacketType();
-        if (packetType == PacketType.Publish)
+        if (packetType == PacketType.Connect)
+        {
+            var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
+            var connPacket = (ConnectPacket)packetFactory!.GetPacket();
+            var connAckPacket = new ConnAckPacket()
+            {
+                ReasonCode = ConnectReturnCode.Accepted
+            };
+            packetFactory = AdaptFactory.CreatePacketFactory(connAckPacket);
+            await _mqttChannel.Send(packetFactory!.Encode());
+
+            await ReceiveMessage(connPacket);
+        }
+        else if (packetType == PacketType.Disconnect)
+        {
+            //var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
+           // var disConnPacket = (DisConnectPacket)packetFactory!.GetPacket();
+            await ReceiveMessage(new DisConnectPacket());
+            Dispose();
+        }
+        else if (packetType == PacketType.Subscribe)
+        {
+            var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
+            var subscribePacket = (SubscribePacket)packetFactory!.GetPacket();
+            
+            var subAckPacket = new SubAckPacket()
+            {
+                PacketIdentifier = subscribePacket.PacketIdentifier
+            };
+            
+            packetFactory = AdaptFactory.CreatePacketFactory(subAckPacket);
+            await _mqttChannel.Send(packetFactory!.Encode());
+            await ReceiveMessage(subscribePacket);
+        }
+        else if (packetType == PacketType.PingReq)
+        {
+            var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
+            var pingPacket = packetFactory!.GetPacket();
+            
+            var pingRespPacket = new PingRespPacket();
+            packetFactory = AdaptFactory.CreatePacketFactory(pingRespPacket);
+            await _mqttChannel.Send(packetFactory!.Encode());
+            await ReceiveMessage(pingPacket);
+        }
+        else if (packetType == PacketType.Publish)
         {
             var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
             var publishPacket = (PublishPacket)packetFactory!.GetPacket();
 
             if (publishPacket.QoS == Qos.AtMostOnce)
             {
-                ReceiveMessage?.Invoke(new ReceiveOption(publishPacket.TopicName, publishPacket.Message));
+                await ReceiveMessage.Invoke(publishPacket)!;
             }
             else if (publishPacket.QoS == Qos.AtLeastOnce)
             {
@@ -67,7 +111,7 @@ public class MqttClient : IDisposable
                 packetFactory = AdaptFactory.CreatePacketFactory(pubAckPacket);
                 await _mqttChannel.Send(packetFactory!.Encode());
               
-                ReceiveMessage?.Invoke(new ReceiveOption(publishPacket.TopicName, publishPacket.Message));
+                await ReceiveMessage.Invoke(publishPacket)!;
             }
             else if (publishPacket.QoS == Qos.ExactlyOnce)
             {
@@ -86,7 +130,7 @@ public class MqttClient : IDisposable
                 packetFactory = AdaptFactory.CreatePacketFactory(compPacket);
                 await _mqttChannel.Send(packetFactory!.Encode());
                 
-                ReceiveMessage?.Invoke(new ReceiveOption(publishPacket.TopicName, publishPacket.Message));
+                await ReceiveMessage.Invoke(publishPacket);
             }
         }
         else

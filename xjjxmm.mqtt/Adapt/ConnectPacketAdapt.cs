@@ -15,9 +15,44 @@ internal class ConnectPacketAdapt : IAdaptFactory
         packet = CreatePacket(option);
     }
     
-    public ConnectPacketAdapt(ReceivedPacket option)
+    public ConnectPacketAdapt(ReceivedPacket received)
     {
+        packet = new ConnectPacket();
+        
+        var helper = received.GetPacketHelper();
+        var remainingLength = received.RemainingLength;
+
        
+        helper.NextStr();
+
+        var protocol = helper.Next();
+        var connectFlags = helper.Next();
+        packet.CleanSession = (connectFlags & 0b_0000_0010) == 0b_0000_0010;
+        var willFlag = (connectFlags & 0b_0000_0100) == 0b_0000_0100;
+        packet.QoS = (byte) ((connectFlags & 0b_0000_1100) >> 3);
+        packet.Retain = (connectFlags & 0b_0010_0000) == 0b_0010_0000;
+        
+        var hasUser = (connectFlags & 0b_0100_0000) == 0b_0100_0000;
+        var hasPassword = (connectFlags & 0b_1000_0000) == 0b_1000_0000;
+        packet.KeepAliveSecond = helper.NextTwoByteInt();
+        
+        var clientId = helper.NextStr();
+        packet.ClientId = clientId;
+        if (willFlag)
+        {
+            packet.WillTopic = helper.NextStr();
+            packet.WillMessage = helper.NextStr();
+        }
+
+        if (hasUser)
+        {
+            packet.UserName = helper.NextStr();
+        }
+
+        if (hasPassword)
+        {
+            packet.Password = helper.NextStr();
+        }
     }
     
     public ConnectPacketAdapt(ConnectPacket option)
@@ -65,12 +100,23 @@ internal class ConnectPacketAdapt : IAdaptFactory
     private byte[]? _passwordByte;
     private byte[]? _userNameByte;
 
+    private byte[]? _willTopicByte;
+    private byte[]? _willMessageByte;
+    
+    private List<byte> Data { get; } = new List<byte>();
+    
     private ArraySegment<byte> CreateBytes(ConnectPacket connectOption)
     {
         _connectOption = connectOption;
 
         _clientByte = connectOption.ClientId.ToBytes();
 
+        if (connectOption.WillFlag)
+        {
+            _willTopicByte = connectOption.WillTopic.ToBytes();
+            _willMessageByte = connectOption.WillMessage.ToBytes();
+        }
+        
         if (connectOption.HasUserName) _userNameByte = connectOption.UserName.ToBytes();
 
         if (connectOption.HasPassword) _passwordByte = connectOption.Password.ToBytes();
@@ -82,7 +128,7 @@ internal class ConnectPacketAdapt : IAdaptFactory
         return Data.ToArray();
     }
 
-    private List<byte> Data { get; } = new List<byte>();
+ 
     
     private void PushHeaders()
     {
@@ -92,9 +138,26 @@ internal class ConnectPacketAdapt : IAdaptFactory
     private void PushRemainingLength()
     {
         var len = 10 + 2 + _clientByte.Length;
-        if (_userNameByte != null) len += 2 + _userNameByte.Length;
+        
+        if (_willTopicByte != null)
+        {
+            len += 2 + _willTopicByte.Length;
+        }
+        
+        if (_willMessageByte != null)
+        {
+            len += 2 + _willMessageByte.Length;
+        }
+        
+        if (_userNameByte != null)
+        {
+            len += 2 + _userNameByte.Length;
+        }
 
-        if (_passwordByte != null) len += 2 + _passwordByte.Length;
+        if (_passwordByte != null)
+        {
+            len += 2 + _passwordByte.Length;
+        }
 
         foreach (var l in UtilHelpers.ComputeRemainingLength(len)) Data.Add(Convert.ToByte(l));
     }
@@ -137,6 +200,17 @@ internal class ConnectPacketAdapt : IAdaptFactory
         Data.Add((byte)(_clientByte.Length & 255));
         Data.AddRange(_clientByte);
 
+        if (_connectOption.WillFlag)
+        {
+            Data.Add((byte)(_willTopicByte!.Length >> 8));
+            Data.Add((byte)(_willTopicByte.Length & 255));
+            Data.AddRange(_willTopicByte!);
+            
+            Data.Add((byte)(_willMessageByte!.Length >> 8));
+            Data.Add((byte)(_willMessageByte.Length & 255));
+            Data.AddRange(_willMessageByte!);
+        }
+        
         if (_connectOption.HasUserName)
         {
             Data.Add((byte)(_userNameByte!.Length >> 8));

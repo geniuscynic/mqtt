@@ -36,6 +36,12 @@ public class PacketHelper(ArraySegment<byte> bytes)
         pos += size;
         return tmp;
     }
+  
+    public string NextStr()
+    {
+        var size = NextTwoByteInt();
+        return NextStr(size);
+    }
     
     public string NextStr(int size)
     {

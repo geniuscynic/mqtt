@@ -1,4 +1,6 @@
-﻿using xjjxmm.mqtt.MqttPacket;
+﻿using mqtt.client.test;
+using xjjxmm.mqtt.Constant;
+using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
 
@@ -17,7 +19,7 @@ internal class ConnAckPacketAdapt : IAdaptFactory
         packet = new();
         var readerHelper = received.GetPacketHelper();
         packet.IsSessionPresent = readerHelper.Next() == 1;
-        packet.ReasonCode = readerHelper.Next();
+        packet.ReasonCode = (ConnectReturnCode)readerHelper.Next();
     }
     
     public ConnAckPacketAdapt(ConnAckPacket option)
@@ -31,7 +33,22 @@ internal class ConnAckPacketAdapt : IAdaptFactory
 
     public ArraySegment<byte> Encode()
     {
-        throw new NotImplementedException();
+        byte header = (byte)PacketType.ConnAck << 4;
+        byte remainingLength = 0x02;
+        var variableHeader = new byte[]
+        {
+            0x00,
+            0x00
+        };
+       var bytes = new []
+       {
+           header,
+           remainingLength,
+           variableHeader[0],
+           variableHeader[1]
+       };
+        new ArraySegment<byte>(bytes).Dump("conack");
+       return bytes;
     }
 
     public IOption GetOption()

@@ -22,3 +22,8 @@ internal class ConnectPacket : MqttPacket
     public string Password { get; set; } = string.Empty;
     public int KeepAliveSecond { get; set; } = 60;
 }
+
+internal class DisConnectPacket : MqttPacket
+{
+    
+}

@@ -1,111 +1,132 @@
-﻿
+﻿using System.Net;
+using mqtt.client.test;
+using mqtt.server.Constant;
+using xjjxmm.mqtt.Adapt;
+using xjjxmm.mqtt.Client;
+using xjjxmm.mqtt.Constant;
+using xjjxmm.mqtt.Net;
+using xjjxmm.mqtt.Options;
+using xjjxmm.mqtt.Packet;
+
 namespace xjjxmm.mqtt.Server;
 
-internal class MqttServer //: IDisposable
+public class MqttServer : IDisposable
 {
-    /*private readonly SocketProxy _socketClient = new();
+    private readonly SocketProxy _server = new();
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-   
-    private readonly Queue<ICommand> _commands = new Queue<ICommand>();
-    Queue<ICommand> _tmpCommands = new Queue<ICommand>();
-    //创建与远程主机的连接
-    
+    private SocketIdProvider _provider = new ();
+
+
+    private Dictionary<string, SocketInfo> _socketInfoDict = new();
+    private Dictionary<string, List<string>> _subscribeDict = new();
     public async Task Start()
     {
+        // _dispatcher = new Dispatcher();
         await ClientConnected();
     }
-        
+
     private async Task ClientConnected()
     {
+        //https://www.cnblogs.com/whuanle/p/10375526.html
+        IPAddress iP = IPAddress.Parse("127.0.0.1");
+        _server.Bind(new IPEndPoint(iP, 1883));
+        _server.Listen(10);//开始监听
+        
         while (true)
         {
             var client = await _server.Accept();
             SocketInfo socketInfo = new SocketInfo();
-            _socketId++;
-            socketInfo.Id = _socketId;
-            socketInfo.Socket = client;
-            ReceiveMessage(socketInfo);
+            MqttClientChannel clientChannel = new MqttClientChannel(client); 
+            socketInfo.Id = _provider.Next();
+            socketInfo.Channel = clientChannel;
+            clientChannel.ReceiveMessage = async (receivedPacket) => { await Receive(socketInfo, receivedPacket); };
         }
     }
-    
-    public async Task<ReceivedPacket> Send(ISendCommand command, int timeout = 1000 * 10)
-    {
-        _commands.Enqueue(command);
-        await _socketClient.Send(command.Encode(), _cancellationTokenSource.Token);
-        
-        using var cts = new CancellationTokenSource();
-        cts.Token.Register(() => command.Result.TrySetException(new TimeoutException()), useSynchronizationContext: false);
-        cts.CancelAfter(timeout);
-        
-        return await command.Result.Task;
-    }
-    
-    public async Task SendNoAnswer(ISendCommand command)
-    {
-        await _socketClient.Send(command.Encode(), _cancellationTokenSource.Token);
-    }
-    
-    public async Task<ReceivedPacket> ReceiveCommand(ICommand command)
-    {
-        _commands.Enqueue(command);
-        
-        return await command.Result.Task;
-    }
-    
-     public async Task Receive()
-    {
-        const int bufferSize = 2;
-        ArraySegment<byte> buffer = new (new byte[bufferSize]);
 
-        while (true)
+    private async Task Receive(SocketInfo socketInfo, Packet.MqttPacket receivedPacket)
+    {
+        if (receivedPacket is ConnectPacket connectPacket)
         {
-            var size = await _socketClient.Receive(buffer); 
-            if (size > 0)
+            socketInfo.ClientId = connectPacket.ClientId;
+            AddSocketClient(socketInfo);
+        }
+        else if(receivedPacket is DisConnectPacket)
+        {
+            RemoveSocketClient(socketInfo);
+        }
+        else if (receivedPacket is SubscribePacket subscribePacket)
+        {
+            if (!_subscribeDict.ContainsKey(subscribePacket.TopicName))
             {
-                var remainingLength = buffer[1];
-                
-                var body = await _socketClient.Receive(remainingLength);
-                var receivePacket = new ReceivedPacket(buffer[0], remainingLength, body);
-                if (receivePacket.RemainingLength > remainingLength)
-                {
-                    body = await _socketClient.Receive(receivePacket.TotalLength - remainingLength);
-                    receivePacket.Append(body);
-                }
-                
-                var commandName = receivePacket.GetCommandName();
-                while (_commands.Any())
-                {
-                    var command = _commands.Dequeue();
-                    if (command.AcceptCommand == commandName )
-                    {
-                        Task.Run(()=>
-                        {
-                            command.Result.SetResult(receivePacket);
-                        });
-                        break;
-                    }
-                    else
-                    {
-                        _tmpCommands.Enqueue(command);
-                    }
-                }
-
-                while (_tmpCommands.Any())
-                {
-                    _commands.Enqueue(_tmpCommands.Dequeue());
-                }
+                _subscribeDict.Add(subscribePacket.TopicName, new List<string>());
             }
-            else
+
+            if (!_subscribeDict[subscribePacket.TopicName].Contains(socketInfo.ClientId))
             {
-                //Console.WriteLine($"{socketInfo.Id} 断开连接");
-                break;
+                _subscribeDict[subscribePacket.TopicName].Add(socketInfo.ClientId);
+            }
+        }
+        else if (receivedPacket is PingReqPacket)
+        {
+            
+        }
+        else if(receivedPacket is PublishPacket publishPacket)
+        {
+                if(_subscribeDict.TryGetValue(publishPacket.TopicName, out var socketIds))
+                {
+                    var missIds = new List<string>();
+                    foreach (var socketId in socketIds)
+                    {
+                        if (_socketInfoDict.TryGetValue(socketId, out var subSocketInfo))
+                        {
+                           // var packetFactory = AdaptFactory.CreatePacketFactory(option);
+                            await subSocketInfo.Channel.Publish(new PublishOption()
+                            {
+                                 TopicName = publishPacket.TopicName,
+                                 Message = publishPacket.Message,
+                                 QoS= publishPacket.QoS
+                            });
+                        }
+                        else
+                        {
+                            missIds.Add(socketId);
+                        }
+                    }
+                    socketIds.RemoveAll(t => missIds.Contains(t));
             }
         }
     }
 
-     public void Dispose()
-     {
-         _socketClient.Close();
-     }*/
+    public void Dispose()
+    {
+        _server.Close();
+    }
+
+    private void AddSocketClient(SocketInfo socketInfo)
+    {
+        "new client Id".Dump();
+        socketInfo.ClientId.Dump();
+        //RemoveSocketClient(socketInfo);
+        if (_socketInfoDict.TryGetValue(socketInfo.ClientId, out var existClient))
+        {
+            "Exist client id:".Dump();
+            existClient.ClientId.Dump();
+            existClient.Channel.Dispose();
+        }
+        _socketInfoDict[socketInfo.ClientId] = socketInfo;
+    }
+
+    private void RemoveSocketClient(SocketInfo socketInfo)
+    {
+        _socketInfoDict.Remove(socketInfo.ClientId);
+    }
+}
+
+internal class SocketInfo
+{
+    public int Id { get; set; }
+    public string ClientId { get; set; }
+    //public Dispatcher Dispatcher { get; set; }
+    public MqttClientChannel Channel { get; set; }
 }

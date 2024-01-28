@@ -1,6 +1,5 @@
 ﻿using mqtt.server.Constant;
 using xjjxmm.mqtt.Adapt;
-using xjjxmm.mqtt.Channel;
 using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Net;
@@ -19,13 +18,14 @@ public class MqttClient : IDisposable
 
     public MqttClient()
     {
-        _mqttChannel = new MqttChannel();
+        SocketProxy socketClient = new SocketProxy();
+        _mqttChannel = new MqttChannel(socketClient, Receive);
         _dispatcher = new Dispatcher(_mqttChannel);
     }
 
     public async Task<ConnAckOption> Connect(ConnectOption option)
     {
-        _mqttChannel.Received = Receive;
+        //_mqttChannel.Received = Receive;
         
         //var command = Command.Command.Create(CommandEnum.SendConnect, option);
         var packetFactory = AdaptFactory.CreatePacketFactory(option);
@@ -67,7 +67,7 @@ public class MqttClient : IDisposable
 
                 packetFactory = AdaptFactory.CreatePacketFactory(pubAckPacket);
                 await _mqttChannel.Send(packetFactory!.Encode());
-                
+              
                 ReceiveMessage?.Invoke(new ReceiveOption(publishPacket.TopicName, publishPacket.Message));
             }
             else if (publishPacket.QoS == Qos.ExactlyOnce)
@@ -78,7 +78,6 @@ public class MqttClient : IDisposable
                 };
 
                 packetFactory = AdaptFactory.CreatePacketFactory(pubRecPacket);
-                //await _mqttChannel.Send(packetFactory!.Encode());
                 var pubRelFactory = await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRel);
                 var pubRelPacket = (PubRelPacket)pubRelFactory!.GetPacket();
                 var compPacket = new PubRecPacket()

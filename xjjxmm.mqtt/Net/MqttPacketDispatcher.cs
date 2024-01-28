@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using xjjxmm.mqtt.Adapt;
-using xjjxmm.mqtt.Channel;
+using xjjxmm.mqtt.Client;
 using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Packet;
@@ -26,16 +26,8 @@ internal class AwaitableMqttPacket(PacketType packet, ushort packetIdentifier )
     
 }
 
-internal class Dispatcher
+internal class Dispatcher(MqttChannel mqttChannel)
 {
-    private readonly MqttChannel _mqttChannel;
-    public Dispatcher(MqttChannel mqttChannel)
-    {
-        _mqttChannel = mqttChannel;
-    }
-
-   
-
     private ConcurrentQueue<AwaitableMqttPacket> _commands = new();
     private ConcurrentQueue<AwaitableMqttPacket> _tmpCommands = new();
     public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, PacketType packetType)
@@ -50,7 +42,7 @@ internal class Dispatcher
         AwaitableMqttPacket awaitableMqttPacket = new AwaitableMqttPacket(packetType, packetIdentifier);
         _commands.Enqueue(awaitableMqttPacket);
 
-        await _mqttChannel.Send(packetFactory.Encode());
+        await mqttChannel.Send(packetFactory.Encode());
         
         var receivePacket =  await awaitableMqttPacket.GetResult();
         return receivePacket;

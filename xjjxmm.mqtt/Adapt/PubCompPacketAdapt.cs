@@ -40,8 +40,7 @@ internal class PubCompPacketAdapt : IAdaptFactory
 
     private List<byte> Data { get; } = new List<byte>();
     
-    private readonly byte lsb;
-    private readonly byte msb;
+   
     protected  void PushHeaders()
     {
         byte header = (byte)PacketType.PubRel << 4;
@@ -56,6 +55,8 @@ internal class PubCompPacketAdapt : IAdaptFactory
 
     protected  void PushVariableHeader()
     {
+        var msb = (byte)(packet.PacketIdentifier >> 8);
+        var lsb = (byte)(packet.PacketIdentifier & 255);
         Data.Add(msb);
         Data.Add(lsb);
     }

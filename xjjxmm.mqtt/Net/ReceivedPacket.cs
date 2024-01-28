@@ -1,4 +1,5 @@
-﻿using mqtt.server.Constant;
+﻿using mqtt.client.test;
+using mqtt.server.Constant;
 using xjjxmm.mqtt.Constant;
 using xjjxmm.mqtt.Net;
 using xjjxmm.mqtt.Util;
@@ -36,8 +37,8 @@ internal class ReceivedPacket(SocketProxy socketProxy)
             
             if (remainingLength > RemainingLength)
             {
+                body = await socketProxy.Receive(TotalLength - RemainingLength - 1);
                 RemainingLength = remainingLength;
-                body = await socketProxy.Receive(TotalLength - remainingLength - 1);
                 Append(body);
             }
         }
@@ -45,7 +46,7 @@ internal class ReceivedPacket(SocketProxy socketProxy)
         return size;
     }
     
-    public void Append(ArraySegment<byte> content)
+    private void Append(ArraySegment<byte> content)
     {
         _packetHelper.Append(content);
     }
@@ -86,5 +87,11 @@ internal class ReceivedPacket(SocketProxy socketProxy)
     public PacketHelper GetPacketHelper()
     {
         return _packetHelper;
+    }
+
+    public void Dump()
+    {
+        _buffer.Dump("dump");
+        _packetHelper.GetAll().Dump("dump");
     }
 }

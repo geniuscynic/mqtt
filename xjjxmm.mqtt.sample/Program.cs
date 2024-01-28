@@ -11,8 +11,8 @@ using xjjxmm.mqtt.sample.Client;
 
 //await Client_Connection_Samples.Connect_Client();
 //await Client2_Publish_Samples.PublishQos2();
-await Client2_Subscribe_Samples.SubscribeQos2();
-
+//await Client2_Subscribe_Samples.SubscribeQos2();
+await Server_Samples.ServerStart();
 
 Console.WriteLine("Hello, World!");
 Console.Read();
