@@ -36,11 +36,16 @@ public class MqttServer : IDisposable
         while (true)
         {
             var client = await _server.Accept();
+           
+            MqttClientChannel clientChannel = new MqttClientChannel(client);
+            
+
             SocketInfo socketInfo = new SocketInfo();
-            MqttClientChannel clientChannel = new MqttClientChannel(client); 
             socketInfo.Id = _provider.Next();
             socketInfo.Channel = clientChannel;
             clientChannel.ReceiveMessage = async (receivedPacket) => { await Receive(socketInfo, receivedPacket); };
+            clientChannel.Init();
+            await Task.Delay(100000);
         }
     }
 

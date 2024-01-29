@@ -26,7 +26,7 @@ public class MqttClient2 : IDisposable
     public async Task<ConnAckOption> Connect(ConnectOption option)
     {
         _mqttChannel.ReceiveMessage = Receive;
-        
+        _mqttChannel.Init();
         return await _mqttChannel.Connect(option);
     }
 

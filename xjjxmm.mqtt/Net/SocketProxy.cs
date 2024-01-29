@@ -44,7 +44,8 @@ namespace xjjxmm.mqtt.Net
         /// <returns></returns>
         public async Task<SocketProxy> Accept()
         {
-            return new  SocketProxy(await _socket.AcceptAsync());
+            var socket = await _socket.AcceptAsync();
+            return new  SocketProxy(socket);
         }
        
         /// <summary>

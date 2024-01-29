@@ -5,6 +5,10 @@ public enum PacketType
 {
     // The connection request is sent by the server to the client to
     // request a connection to the server.
+    None = 0x00,
+
+    // The connection request is sent by the server to the client to
+    // request a connection to the server.
     Connect = 0x01,
 
     // The connection request is sent by the client to the server to

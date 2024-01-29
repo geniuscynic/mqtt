@@ -28,6 +28,11 @@ internal class ReceivedPacket(SocketProxy socketProxy)
         if (size > 0)
         {
             Header = _buffer[0];
+            if(Header == 0)
+            {
+                return size;
+            }
+
             RemainingLength = _buffer[1];
             
             var body = await socketProxy.Receive(RemainingLength);

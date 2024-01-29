@@ -15,7 +15,6 @@ internal class MqttChannel : IDisposable
     {
         _socketClient = socketClient;
         _received = received;
-        Receive();
     }
     
     public async Task Connect(ConnectPacket packet)
@@ -28,7 +27,7 @@ internal class MqttChannel : IDisposable
         await _socketClient.Send(bytes, _cancellationTokenSource.Token);
     }
     
-    private async Task Receive()
+    public async Task Receive()
     {
         while (true)
         {
@@ -36,10 +35,9 @@ internal class MqttChannel : IDisposable
             var size = await receivePacket.Receive(); 
             if (size > 0)
             {
-                if (_received != null)
-                {
-                   _received.Invoke(receivePacket);
-                }
+                
+                  _received.Invoke(receivePacket);
+                
             }
             else
             {

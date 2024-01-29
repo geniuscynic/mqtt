@@ -19,9 +19,13 @@ internal class MqttClientChannel : IDisposable
 
     public MqttClientChannel(SocketProxy socketClient )
     {
-       // SocketProxy socketClient = new SocketProxy();
         _mqttChannel = new MqttChannel(socketClient, Receive);
         _dispatcher = new Dispatcher(_mqttChannel);
+    }
+
+    public async Task Init()
+    {
+         await _mqttChannel.Receive();
     }
 
     public async Task<ConnAckOption> Connect(ConnectOption option)
@@ -132,6 +136,10 @@ internal class MqttClientChannel : IDisposable
                 
                 await ReceiveMessage.Invoke(publishPacket);
             }
+        }
+        else if(packetType == PacketType.None)
+        {
+
         }
         else
         {
