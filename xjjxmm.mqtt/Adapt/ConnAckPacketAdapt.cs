@@ -47,7 +47,7 @@ internal class ConnAckPacketAdapt : IAdaptFactory
            variableHeader[0],
            variableHeader[1]
        };
-        new ArraySegment<byte>(bytes).Dump("conack");
+       // new ArraySegment<byte>(bytes).Dump("conack");
        return bytes;
     }
 

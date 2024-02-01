@@ -1,7 +1,7 @@
 ﻿namespace xjjxmm.mqtt.Packet;
 
-internal class UnSubscribePacket :MqttPacket
+internal class UnSubscribePacket :IdentifierPacket
 {
-    public List<string> TopicFilters { get; set; } = new List<string>();
+    public List<string> TopicNames { get; set; } = new List<string>();
     
 }

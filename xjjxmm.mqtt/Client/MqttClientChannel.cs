@@ -23,7 +23,7 @@ internal class MqttClientChannel : IDisposable
         _dispatcher = new Dispatcher(_mqttChannel);
     }
 
-    public async Task Init()
+    public async Task StartReceive()
     {
          await _mqttChannel.Receive();
     }
@@ -83,6 +83,20 @@ internal class MqttClientChannel : IDisposable
             };
             
             packetFactory = AdaptFactory.CreatePacketFactory(subAckPacket);
+            await _mqttChannel.Send(packetFactory!.Encode());
+            await ReceiveMessage(subscribePacket);
+        }
+        else if (packetType == PacketType.UnSubscribe)
+        {
+            var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
+            var subscribePacket = (UnSubscribePacket)packetFactory!.GetPacket();
+            
+            var unSubAckPacket = new UnSubAckPacket()
+            {
+                PacketIdentifier = subscribePacket.PacketIdentifier
+            };
+            
+            packetFactory = AdaptFactory.CreatePacketFactory(unSubAckPacket);
             await _mqttChannel.Send(packetFactory!.Encode());
             await ReceiveMessage(subscribePacket);
         }
