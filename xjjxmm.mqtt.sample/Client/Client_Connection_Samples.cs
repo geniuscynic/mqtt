@@ -26,20 +26,19 @@ public static class Client_Connection_Samples
 
     public static async Task Connect_Client()
     {
-        var mqttClient = new MqttClient();
+        var mqttClient = new MqttClient2();
         /*mqttClient.ConnAckAction = option =>
         {
             option.ToString().Dump();
         };*/
         
-       
-
-        
+      
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
             CleanSession = false
         };
-        await mqttClient.Connect(mqttClientOptions);
+        var conAck = await mqttClient.Connect(mqttClientOptions);
+        var reson = conAck.ReasonCode;
     }
     
 }

@@ -19,7 +19,7 @@ public static class Client2_Publish_Samples
 {
     public static async Task PublishQos0()
     {
-        var mqttClient = new MqttClient();
+        var mqttClient = new MqttClient2();
        
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
