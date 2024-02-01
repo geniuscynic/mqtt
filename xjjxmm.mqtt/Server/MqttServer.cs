@@ -15,11 +15,12 @@ public class MqttServer : IDisposable
     private readonly SocketProxy _server = new();
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private SocketIdProvider _provider = new ();
+    private SocketIdProvider _provider = new();
 
 
     private Dictionary<string, SocketInfo> _socketInfoDict = new();
-    private Dictionary<string, List<string>> _subscribeDict = new();
+    private Dictionary<string, List<SocketInfo?>> _subscribeDict = new();
+
     public async Task Start()
     {
         // _dispatcher = new Dispatcher();
@@ -31,20 +32,20 @@ public class MqttServer : IDisposable
         //https://www.cnblogs.com/whuanle/p/10375526.html
         IPAddress iP = IPAddress.Parse("127.0.0.1");
         _server.Bind(new IPEndPoint(iP, 1883));
-        _server.Listen(10);//开始监听
-        
+        _server.Listen(10); //开始监听
+
         while (true)
         {
             var client = await _server.Accept();
-           
+
             MqttClientChannel clientChannel = new MqttClientChannel(client);
-            
+
             SocketInfo socketInfo = new SocketInfo();
             socketInfo.Id = _provider.Next();
             socketInfo.Channel = clientChannel;
             clientChannel.ReceiveMessage = async (receivedPacket) => { await Receive(socketInfo, receivedPacket); };
             clientChannel.StartReceive();
-           // await Task.Delay(100000);
+            // await Task.Delay(100000);
         }
     }
 
@@ -55,7 +56,7 @@ public class MqttServer : IDisposable
             socketInfo.ClientId = connectPacket.ClientId;
             AddSocketClient(socketInfo);
         }
-        else if(receivedPacket is DisConnectPacket)
+        else if (receivedPacket is DisConnectPacket)
         {
             RemoveSocketClient(socketInfo);
         }
@@ -63,12 +64,12 @@ public class MqttServer : IDisposable
         {
             if (!_subscribeDict.ContainsKey(subscribePacket.TopicName))
             {
-                _subscribeDict.Add(subscribePacket.TopicName, new List<string>());
+                _subscribeDict.Add(subscribePacket.TopicName, new List<SocketInfo>());
             }
 
-            if (!_subscribeDict[subscribePacket.TopicName].Contains(socketInfo.ClientId))
+            if (!_subscribeDict[subscribePacket.TopicName].Contains(socketInfo))
             {
-                _subscribeDict[subscribePacket.TopicName].Add(socketInfo.ClientId);
+                _subscribeDict[subscribePacket.TopicName].Add(socketInfo);
                 socketInfo.SubscribeInfos[subscribePacket.TopicName] = subscribePacket.QoS;
             }
         }
@@ -76,40 +77,27 @@ public class MqttServer : IDisposable
         {
             foreach (var topicFilter in unSubscribePacket.TopicNames)
             {
-               
-                    _subscribeDict[topicFilter].Remove(socketInfo.ClientId);
-                    socketInfo.SubscribeInfos.Remove(topicFilter);
+                _subscribeDict[topicFilter].Remove(socketInfo);
+                socketInfo.SubscribeInfos.Remove(topicFilter);
             }
-
-           
         }
         else if (receivedPacket is PingReqPacket)
         {
-            
         }
-        else if(receivedPacket is PublishPacket publishPacket)
+        else if (receivedPacket is PublishPacket publishPacket)
         {
-                if(_subscribeDict.TryGetValue(publishPacket.TopicName, out var socketIds))
+            if (_subscribeDict.TryGetValue(publishPacket.TopicName, out var socketIds))
+            {
+                socketIds.RemoveAll(t => t == null);
+                foreach (var subSocketInfo in socketIds)
                 {
-                    var missIds = new List<string>();
-                    foreach (var socketId in socketIds)
+                    await subSocketInfo!.Channel.Publish(new PublishOption()
                     {
-                        if (_socketInfoDict.TryGetValue(socketId, out var subSocketInfo))
-                        {
-                           // var packetFactory = AdaptFactory.CreatePacketFactory(option);
-                            await subSocketInfo.Channel.Publish(new PublishOption()
-                            {
-                                 TopicName = publishPacket.TopicName,
-                                 Message = publishPacket.Message,
-                                 QoS= publishPacket.QoS
-                            });
-                        }
-                        else
-                        {
-                            missIds.Add(socketId);
-                        }
-                    }
-                    socketIds.RemoveAll(t => missIds.Contains(t));
+                        TopicName = publishPacket.TopicName,
+                        Message = publishPacket.Message,
+                        QoS = subSocketInfo.SubscribeInfos[publishPacket.TopicName]
+                    });
+                }
             }
         }
     }
@@ -121,37 +109,42 @@ public class MqttServer : IDisposable
 
     private void AddSocketClient(SocketInfo socketInfo)
     {
-      //  "new client Id".Dump();
-      //  socketInfo.ClientId.Dump();
+        //  "new client Id".Dump();
+        //  socketInfo.ClientId.Dump();
         //RemoveSocketClient(socketInfo);
         if (_socketInfoDict.TryGetValue(socketInfo.ClientId, out var existClient))
         {
-           // "Exist client id:".Dump();
-            existClient.ClientId.Dump();
+            // "Exist client id:".Dump();
+            //existClient.ClientId.Dump();
             existClient.Channel.Dispose();
+            existClient = null;
         }
+
         _socketInfoDict[socketInfo.ClientId] = socketInfo;
     }
 
     private void RemoveSocketClient(SocketInfo socketInfo)
     {
         _socketInfoDict.Remove(socketInfo.ClientId);
+        socketInfo = null;
     }
 }
 
 internal class SocketInfo
 {
     public int Id { get; set; }
+
     public string ClientId { get; set; }
+
     //public Dispatcher Dispatcher { get; set; }
     public MqttClientChannel Channel { get; set; }
 
-    public Dictionary<string, byte> SubscribeInfos { get; set; } = new ();
+    public Dictionary<string, byte> SubscribeInfos { get; set; } = new();
 }
 
 internal class SubscribeInfo
 {
     public string TopicName { get; set; }
-    
+
     public byte QoS { get; set; }
 }
