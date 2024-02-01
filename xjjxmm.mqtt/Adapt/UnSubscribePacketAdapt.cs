@@ -12,20 +12,24 @@ internal class UnSubscribePacketAdapt : IAdaptFactory
     {
         packet = new UnSubscribePacket()
         {
-            TopicFilters = option.TopicFilters
+            TopicNames = option.TopicFilters
         };
 
     }
     
     public UnSubscribePacketAdapt(ReceivedPacket received)
     {
-        /*var helper = received.GetPacketHelper();
+        var helper = received.GetPacketHelper();
         var packetIdentifier = helper.NextTwoByteInt();
-
+        var topic = helper.NextStr();
         packet = new UnSubscribePacket
         {
-            TopicFilters = option.TopicFilters
-        };*/
+            PacketIdentifier = packetIdentifier,
+            TopicNames = new List<string>()
+            {
+                topic
+            }
+        };
     }
     
     public UnSubscribePacketAdapt(UnSubscribePacket option)
@@ -78,7 +82,7 @@ internal class UnSubscribePacketAdapt : IAdaptFactory
     {
         return new UnSubscribeOption()
         {
-            TopicFilters = packet.TopicFilters
+            TopicFilters = packet.TopicNames
         };
     }
 }

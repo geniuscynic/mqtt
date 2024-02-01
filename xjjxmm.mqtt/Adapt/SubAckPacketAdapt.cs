@@ -1,6 +1,9 @@
-﻿using xjjxmm.mqtt.MqttPacket;
+﻿using mqtt.client.test;
+using xjjxmm.mqtt.Constant;
+using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
+using xjjxmm.mqtt.Util;
 
 namespace xjjxmm.mqtt.Adapt;
 
@@ -37,35 +40,21 @@ internal class SubAckPacketAdapt : IAdaptFactory
     {
         return packet;
     }
-
-    private List<byte> Data { get; } = new List<byte>();
-    
-    protected void PushHeaders()
-    {
-        
-    }
-
-    protected void PushRemainingLength()
-    {
-        
-    }
-
-    protected void PushVariableHeader()
-    {
-    }
-
-    protected void PushPayload()
-    {
-    }
-
     
     public ArraySegment<byte> Encode()
     {
-        PushHeaders();
-        PushRemainingLength();
-        PushVariableHeader();
-        PushPayload();
-        return Data.ToArray();
+        var packetType = (byte)PacketType.SubAck << 4;
+
+        var writeHelper = new BufferWriteHelper();
+        writeHelper.SetHeader((byte)packetType);
+        writeHelper.AddPacketIdentifier(packet.PacketIdentifier);
+        foreach (var packetReasonCode in packet.ReasonCodes)
+        {
+            writeHelper.AddByte(packetReasonCode);
+        }
+
+      //  writeHelper.Build().Dump("suback");
+        return writeHelper.Build();
     }
 
     public IOption GetOption()

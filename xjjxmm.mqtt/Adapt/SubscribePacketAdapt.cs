@@ -21,7 +21,14 @@ internal class SubscribePacketAdapt : IAdaptFactory
     
     public SubscribePacketAdapt(ReceivedPacket received)
     {
-      
+        packet = new SubscribePacket();
+        
+        var helper = received.GetPacketHelper();
+        var remainingLength = received.RemainingLength;
+
+        packet.PacketIdentifier = helper.NextTwoByteInt();
+        packet.TopicName = helper.NextStr();
+        packet.QoS =  helper.Next();
     }
     
     public SubscribePacketAdapt(SubscribePacket option)
@@ -85,6 +92,9 @@ internal class SubscribePacketAdapt : IAdaptFactory
 
     public IOption GetOption()
     {
-        return new PingReqOption();
+        return new SubscribeOption(packet.TopicName)
+        {
+            QoS = packet.QoS
+        };
     }
 }

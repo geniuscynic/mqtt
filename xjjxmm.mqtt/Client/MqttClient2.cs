@@ -26,7 +26,7 @@ public class MqttClient2 : IDisposable
     public async Task<ConnAckOption> Connect(ConnectOption option)
     {
         _mqttChannel.ReceiveMessage = Receive;
-        _mqttChannel.Init();
+        _mqttChannel.StartReceive();
         return await _mqttChannel.Connect(option);
     }
 
@@ -37,15 +37,11 @@ public class MqttClient2 : IDisposable
         await ReceiveMessage?.Invoke(new ReceiveOption(packet.TopicName, packet.Message));
     }
     
-   
-
     public async Task Publish(PublishOption option)
     {
         await _mqttChannel.Publish(option);
     }
-
- 
-
+    
     public async Task<SubAckOption> Subscribe(SubscribeOption option)
     {
         return await _mqttChannel.Subscribe(option);
