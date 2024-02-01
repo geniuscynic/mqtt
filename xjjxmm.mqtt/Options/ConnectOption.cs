@@ -31,7 +31,7 @@ namespace xjjxmm.mqtt.Options
 
         public string Password { get; set; } = string.Empty;
 
-        public int KeepAliveSecond { get; set; } = 60;
+        public int KeepAliveSecond { get; set; } = 5;
         
     }
 }

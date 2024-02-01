@@ -33,7 +33,8 @@ internal class MqttClientChannel : IDisposable
         //var command = Command.Command.Create(CommandEnum.SendConnect, option);
         var packetFactory = AdaptFactory.CreatePacketFactory(option);
         await _mqttChannel.Connect((ConnectPacket)packetFactory!.GetPacket());
-        //await _mqttChannel.Send(packetFactory.Encode());
+        StartReceive();
+        
         packetFactory = await _dispatcher.AddEventHandel(packetFactory, PacketType.ConnAck);
 
         var connAck = (ConnAckOption)packetFactory!.GetOption();
@@ -161,7 +162,7 @@ internal class MqttClientChannel : IDisposable
         }
     }
     
-    private void Ping(int second)
+    public void Ping(int second)
     {
         Task.Factory.StartNew(async () =>
         {

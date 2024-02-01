@@ -16,7 +16,11 @@ internal class AwaitableMqttPacket(PacketType packet, ushort packetIdentifier )
 
     public async Task<IAdaptFactory> GetResult()
     {
-        return await _result.Task;
+        using var cts = new CancellationTokenSource();
+        cts.Token.Register(() => _result.TrySetException(new TimeoutException()), useSynchronizationContext: false);
+        cts.CancelAfter(10000);
+        
+       return await _result.Task;
     }
 
     public void SetResult(IAdaptFactory receivedPacket)
