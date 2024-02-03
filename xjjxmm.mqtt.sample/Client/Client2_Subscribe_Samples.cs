@@ -19,7 +19,7 @@ public static class Client2_Subscribe_Samples
 {
     public static async Task SubscribeQos0()
     {
-        var mqttClient = new MqttClient();
+        var mqttClient = new MqttClient2();
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
@@ -28,7 +28,8 @@ public static class Client2_Subscribe_Samples
         
         mqttClient.ReceiveMessage = option =>
         {
-option.Message.Dump();
+            option.Message.Dump();
+            return Task.CompletedTask;
         };
         
         await mqttClient.Connect(mqttClientOptions);
@@ -38,7 +39,7 @@ option.Message.Dump();
     
     public static async Task SubscribeQos1()
     {
-        var mqttClient = new MqttClient();
+        var mqttClient = new MqttClient2();
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
@@ -48,6 +49,7 @@ option.Message.Dump();
         mqttClient.ReceiveMessage = option =>
         {
             option.Message.Dump();
+            return Task.CompletedTask;
         };
         
         await mqttClient.Connect(mqttClientOptions);
@@ -60,7 +62,7 @@ option.Message.Dump();
 
     public static async Task SubscribeQos2()
     {
-        var mqttClient = new MqttClient();
+        var mqttClient = new MqttClient2();
         
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
@@ -70,7 +72,7 @@ option.Message.Dump();
         mqttClient.ReceiveMessage = option =>
         {
             option.Message.Dump();
-            
+            return Task.CompletedTask;
         };
         
         await mqttClient.Connect(mqttClientOptions);

@@ -99,6 +99,8 @@ public class MqttServer : IDisposable
                     });
                 }
             }
+            
+            publishPacket.Message.Substring(0, 10).Dump();
         }
     }
 

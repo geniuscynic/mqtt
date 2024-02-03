@@ -35,7 +35,7 @@ public static class Client_Connection_Samples
       
         var mqttClientOptions = new ConnectOption("127.0.0.1", 1883, "testClientId")
         {
-            CleanSession = false
+            CleanSession = true
         };
         var conAck = await mqttClient.Connect(mqttClientOptions);
         var reson = conAck.ReasonCode;

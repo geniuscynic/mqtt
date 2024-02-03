@@ -2,6 +2,7 @@
 using xjjxmm.mqtt.MqttPacket;
 using xjjxmm.mqtt.Options;
 using xjjxmm.mqtt.Packet;
+using xjjxmm.mqtt.Util;
 
 namespace xjjxmm.mqtt.Adapt;
 
@@ -38,40 +39,15 @@ internal class PubRecPacketAdapt : IAdaptFactory
         return packet;
     }
 
-    private List<byte> Data { get; } = new List<byte>();
-    
-    protected  void PushHeaders()
-    {
-        byte header = (byte)PacketType.PubRec << 4;
-
-        Data.Add(header);
-    }
-
-    protected  void PushRemainingLength()
-    {
-        Data.Add(0x02);
-    }
-
-    protected  void PushVariableHeader()
-    {
-        var msb = (byte)(packet.PacketIdentifier >> 8);
-        var lsb = (byte)(packet.PacketIdentifier & 255);
-        Data.Add(msb);
-        Data.Add(lsb);
-    }
-
-    protected  void PushPayload()
-    {
-    }
-
-    
     public ArraySegment<byte> Encode()
     {
-        PushHeaders();
-        PushRemainingLength();
-        PushVariableHeader();
-        PushPayload();
-        return Data.ToArray();
+        var packetType = (byte)PacketType.PubRec << 4;
+
+        var writeHelper = new BufferWriteHelper();
+        writeHelper.SetHeader((byte)packetType);
+        writeHelper.AddPacketIdentifier(packet.PacketIdentifier);
+        
+        return writeHelper.Build();
     }
 
     public IOption GetOption()

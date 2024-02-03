@@ -34,6 +34,7 @@ internal class Dispatcher(MqttChannel mqttChannel)
 {
     private ConcurrentQueue<AwaitableMqttPacket> _commands = new();
     private ConcurrentQueue<AwaitableMqttPacket> _tmpCommands = new();
+
     public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, PacketType packetType)
     {
         var packet = packetFactory.GetPacket();
@@ -42,17 +43,39 @@ internal class Dispatcher(MqttChannel mqttChannel)
         {
             packetIdentifier = identifierPacket.PacketIdentifier;
         }
-        
+
         AwaitableMqttPacket awaitableMqttPacket = new AwaitableMqttPacket(packetType, packetIdentifier);
         _commands.Enqueue(awaitableMqttPacket);
 
         await mqttChannel.Send(packetFactory.Encode());
-        
-        var receivePacket =  await awaitableMqttPacket.GetResult();
+
+        var receivePacket = await awaitableMqttPacket.GetResult();
         return receivePacket;
     }
-    
-    public void Dispatch(ReceivedPacket packet)
+
+    public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, PacketType packetType, bool isLoop)
+    {
+        if (isLoop)
+        {
+            while (true)
+            {
+                try
+                {
+                    return await AddEventHandel(packetFactory, packetType);
+                }
+                catch 
+                {
+                    //ignore
+                }
+            }
+        }
+        else
+        {
+            return await AddEventHandel(packetFactory, packetType);
+        }
+    }
+
+public void Dispatch(ReceivedPacket packet)
     {
         AwaitableMqttPacket command;
         while (_commands.TryDequeue(out command))

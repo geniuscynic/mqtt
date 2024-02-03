@@ -11,13 +11,13 @@ internal class PingReqPacketAdapt : IAdaptFactory
     private readonly PingReqPacket packet;
     public PingReqPacketAdapt(PingReqOption option)
     {
-     
-        
+        packet = new PingReqPacket();
+
     }
     
     public PingReqPacketAdapt(ReceivedPacket received)
     {
-      
+        packet = new PingReqPacket();
     }
     
     public PingReqPacketAdapt(PingReqPacket option)
@@ -37,8 +37,7 @@ internal class PingReqPacketAdapt : IAdaptFactory
             (byte)PacketType.PingReq << 4,
             0x00
         });
-
-        bytes.Dump("ping");
+        
         return bytes;
     }
 

@@ -14,6 +14,7 @@ internal class MqttClientChannel : IDisposable
     private readonly MqttChannel _mqttChannel;
     private readonly Dispatcher _dispatcher;
     public Func<Packet.MqttPacket, Task> ReceiveMessage { get; set; }
+    public Action<Exception> DisconnectedAction { get; set; }
    // private readonly HashSet<int> _packetIdentifierHashSet = new();
     private readonly PacketIdentifierProvider _packetIdentifierProvider = new();
 
@@ -129,7 +130,6 @@ internal class MqttClientChannel : IDisposable
 
                 packetFactory = AdaptFactory.CreatePacketFactory(pubAckPacket);
                 await _mqttChannel.Send(packetFactory!.Encode());
-              
                 await ReceiveMessage.Invoke(publishPacket)!;
             }
             else if (publishPacket.QoS == Qos.ExactlyOnce)
@@ -140,7 +140,8 @@ internal class MqttClientChannel : IDisposable
                 };
 
                 packetFactory = AdaptFactory.CreatePacketFactory(pubRecPacket);
-                var pubRelFactory = await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRel);
+                
+                var pubRelFactory = await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRel, true);
                 var pubRelPacket = (PubRelPacket)pubRelFactory!.GetPacket();
                 var compPacket = new PubRecPacket()
                 {
@@ -166,13 +167,27 @@ internal class MqttClientChannel : IDisposable
     {
         Task.Factory.StartNew(async () =>
         {
+            var i = 0;
             while (true)
             {
-                var packetFactory = AdaptFactory.CreatePacketFactory(new PingReqOption());
-                //await _mqttChannel.Send(packetFactory.Encode());
-                await _dispatcher.AddEventHandel(packetFactory!, PacketType.PingResp);
-
-                await Task.Delay(second);
+                try
+                {
+                    var packetFactory = AdaptFactory.CreatePacketFactory(new PingReqOption());
+                    await _dispatcher.AddEventHandel(packetFactory!, PacketType.PingResp);
+                    i = 0;
+                   
+                }
+                catch (Exception e)
+                {
+                    i++;
+                    if (i >= 3)
+                    {
+                        //DisconnectedAction?.Invoke(e);
+                        //Dispose();
+                       // break;
+                    }
+                }
+                await Task.Delay(second * 1000);
             }
         }, TaskCreationOptions.LongRunning);
     }
@@ -201,14 +216,7 @@ internal class MqttClientChannel : IDisposable
 
     private async Task PublishAtLeastOnce(PublishOption option)
     {
-        _packetIdentifierProvider.Next();
-        /*while (_packetIdentifierHashSet.Contains(_packetIdentifierProvider.Current))
-        {
-            _packetIdentifierProvider.Next();
-        }*/
-
-        //_packetIdentifierHashSet.Add(_packetIdentifierProvider.Current);
-        var packetIdentifier = _packetIdentifierProvider.Current;
+        var packetIdentifier = _packetIdentifierProvider.Next();
 
         var packetFactory = AdaptFactory.CreatePacketFactory(option, packetIdentifier);
         while (true)
@@ -231,25 +239,17 @@ internal class MqttClientChannel : IDisposable
 
     private async Task PublishExactlyOnce(PublishOption option)
     {
-        _packetIdentifierProvider.Next();
-        /*while (_packetIdentifierHashSet.Contains(_packetIdentifierProvider.Current))
-        {
-            _packetIdentifierProvider.Next();
-        }*/
-
-        // _packetIdentifierHashSet.Add(_packetIdentifierProvider.Current);
-        var packetIdentifier = _packetIdentifierProvider.Current;
+        var packetIdentifier = _packetIdentifierProvider.Next();
 
         var packetFactory = AdaptFactory.CreatePacketFactory(option, packetIdentifier);
         while (true)
         {
             try
             {
-                //await _mqttChannel.Send(packetFactory!.Encode());
                 await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRec);
                 break;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var publishPack = (PublishPacket)packetFactory!.GetPacket();
                 publishPack.Dup = true;
@@ -260,9 +260,12 @@ internal class MqttClientChannel : IDisposable
         {
             PacketIdentifier = packetIdentifier
         };
-        packetFactory = AdaptFactory.CreatePacketFactory(pubRelPacket);
-        //await _mqttChannel.Send(packetRelFactory!.Encode());
-        await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubComp);
+
+       
+                packetFactory = AdaptFactory.CreatePacketFactory(pubRelPacket);
+                var comAck = await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubComp, true);
+        var a = "";
+        
     }
 
     public async Task<SubAckOption> Subscribe(SubscribeOption option)
