@@ -6,7 +6,7 @@ namespace xjjxmm.mqtt.Net
     //https://zhuanlan.zhihu.com/p/653496155
     internal class SocketProxy
     {
-        private const int ChunkSize = 3;
+        private const int ChunkSize = 8192;
         private readonly Socket _socket;
 
         public SocketProxy()

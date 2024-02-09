@@ -47,14 +47,12 @@ internal class PublishPacketAdapt : IAdaptFactory
         }
 
         var msg = helper.NextStr(msgLength);
-
-       
+        
         packet.TopicName = topic;
         packet.Message = msg;
         packet.Retain = retain;
         packet.QoS = (byte)qos;
         packet.Dup = dup;
-        
     }
     
     public PublishPacketAdapt(PublishPacket option)
@@ -80,7 +78,7 @@ internal class PublishPacketAdapt : IAdaptFactory
         _subjectByte = packet.TopicName.ToBytes();
         _msgByte = packet.Message.ToBytes();
         
-        var header = (byte)PacketType.Publish << 4;
+        var header = (byte)ControlPacketType.Publish << 4;
 
         if (packet.Dup) header |= 0x01 << 3;
 

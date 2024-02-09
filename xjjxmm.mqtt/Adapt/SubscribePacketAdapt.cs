@@ -48,7 +48,7 @@ internal class SubscribePacketAdapt : IAdaptFactory
     protected void PushHeaders()
     {
         //固定报头
-        Data.Add((byte)PacketType.Subscribe << 4);
+        Data.Add((byte)ControlPacketType.Subscribe << 4);
     }
 
     protected void PushRemainingLength()

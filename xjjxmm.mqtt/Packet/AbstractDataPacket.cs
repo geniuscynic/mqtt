@@ -47,5 +47,5 @@ internal abstract class AbstractDataPacket
     /// <returns></returns>
     protected abstract void PushPayload();
 
-    public abstract PacketType GetPacketType();
+    public abstract ControlPacketType GetPacketType();
 }

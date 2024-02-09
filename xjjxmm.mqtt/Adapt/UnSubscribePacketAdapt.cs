@@ -48,7 +48,7 @@ internal class UnSubscribePacketAdapt : IAdaptFactory
     private readonly byte msb;
     protected  void PushHeaders()
     {
-        byte header = (byte)PacketType.UnSubscribe << 4;
+        byte header = (byte)ControlPacketType.UnSubscribe << 4;
 
         Data.Add(header);
     }

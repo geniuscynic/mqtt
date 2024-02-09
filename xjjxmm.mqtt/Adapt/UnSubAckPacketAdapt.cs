@@ -43,7 +43,7 @@ internal class UnSubAckPacketAdapt : IAdaptFactory
     public ArraySegment<byte> Encode()
     {
        
-        var packetType = (byte)PacketType.UnSubAck << 4;
+        var packetType = (byte)ControlPacketType.UnSubAck << 4;
 
         var writeHelper = new BufferWriteHelper();
         writeHelper.SetHeader((byte)packetType);

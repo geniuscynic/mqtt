@@ -42,13 +42,13 @@ internal class PubCompPacketAdapt : IAdaptFactory
     
     public ArraySegment<byte> Encode()
     {
-        var packetType = (byte)PacketType.PubComp << 4;
+        var packetType = (byte)ControlPacketType.PubComp << 4;
 
         var writeHelper = new BufferWriteHelper();
         writeHelper.SetHeader((byte)packetType);
         writeHelper.AddPacketIdentifier(packet.PacketIdentifier);
         
-        writeHelper.Build().Dump("suback");
+         //writeHelper.Build().Dump("puback");
         
         return writeHelper.Build();
     }

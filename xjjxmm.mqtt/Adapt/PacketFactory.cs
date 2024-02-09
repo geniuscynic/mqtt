@@ -51,55 +51,55 @@ internal class AdaptFactory
     
     public static IAdaptFactory? CreatePacketFactory(ReceivedPacket receivedPacket)
     {
-        if (receivedPacket.GetPacketType() == PacketType.Connect)
+        if (receivedPacket.GetPacketType() == ControlPacketType.Connect)
         {
             return new ConnectPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.ConnAck)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.ConnAck)
         {
             return new ConnAckPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.PingReq)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.PingReq)
         {
             return new PingReqPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.PingResp)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.PingResp)
         {
             return new PingRespPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.Subscribe)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.Subscribe)
         {
             return new SubscribePacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.SubAck)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.SubAck)
         {
             return new SubAckPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.UnSubscribe)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.UnSubscribe)
         {
             return new UnSubscribePacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.UnSubAck)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.UnSubAck)
         {
             return new UnSubAckPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.Publish)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.Publish)
         {
             return new PublishPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.PubAck)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.PubAck)
         {
             return new PubAckPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.PubRec)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.PubRec)
         {
             return new PubRecPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.PubRel)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.PubRel)
         {
             return new PubRelPacketAdapt(receivedPacket);
         }
-        else if (receivedPacket.GetPacketType() == PacketType.PubComp)
+        else if (receivedPacket.GetPacketType() == ControlPacketType.PubComp)
         {
             return new PubCompPacketAdapt(receivedPacket);
         }

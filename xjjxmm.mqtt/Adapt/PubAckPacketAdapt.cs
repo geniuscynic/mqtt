@@ -41,7 +41,7 @@ internal class PubAckPacketAdapt : IAdaptFactory
 
     public ArraySegment<byte> Encode()
     {
-        var packetType = (byte)PacketType.PubAck << 4;
+        var packetType = (byte)ControlPacketType.PubAck << 4;
 
         var writeHelper = new BufferWriteHelper();
         writeHelper.SetHeader((byte)packetType);

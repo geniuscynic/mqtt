@@ -33,7 +33,7 @@ internal class ConnAckPacketAdapt : IAdaptFactory
 
     public ArraySegment<byte> Encode()
     {
-        byte header = (byte)PacketType.ConnAck << 4;
+        byte header = (byte)ControlPacketType.ConnAck << 4;
         byte remainingLength = 0x02;
         var variableHeader = new byte[]
         {

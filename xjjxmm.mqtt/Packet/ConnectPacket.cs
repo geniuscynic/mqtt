@@ -1,4 +1,5 @@
 ﻿using mqtt.server.Constant;
+using xjjxmm.mqtt.Constant;
 
 namespace xjjxmm.mqtt.Packet;
 
@@ -9,7 +10,7 @@ internal class ConnectPacket : MqttPacket
 
     public string ClientId { get; set; } = Guid.NewGuid().ToString();
     
-    public byte ProtocolLevel { get; set; } = Protocol.Level3; //协议级别 
+    public byte ProtocolLevel { get; set; } = MqttProtocolLevel.V311; //协议级别 
     public bool CleanSession { get; set; } = true; //清理会话
     public bool WillFlag => !string.IsNullOrEmpty(WillTopic);
     public string WillTopic { get; set; } = string.Empty; //遗嘱主题

@@ -7,10 +7,10 @@ using xjjxmm.mqtt.Packet;
 
 namespace xjjxmm.mqtt.Net;
 
-internal class AwaitableMqttPacket(PacketType packet, ushort packetIdentifier )
+internal class AwaitableMqttPacket(ControlPacketType packet, ushort packetIdentifier )
 {
     public ushort PacketIdentifier { get; } = packetIdentifier;
-    public PacketType PacketType { get; } = packet;
+    public ControlPacketType PacketType { get; } = packet;
 
     private TaskCompletionSource<IAdaptFactory> _result  = new (TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -35,7 +35,7 @@ internal class Dispatcher(MqttChannel mqttChannel)
     private ConcurrentQueue<AwaitableMqttPacket> _commands = new();
     private ConcurrentQueue<AwaitableMqttPacket> _tmpCommands = new();
 
-    public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, PacketType packetType)
+    public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, ControlPacketType packetType)
     {
         var packet = packetFactory.GetPacket();
         ushort packetIdentifier = 0;
@@ -53,7 +53,7 @@ internal class Dispatcher(MqttChannel mqttChannel)
         return receivePacket;
     }
 
-    public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, PacketType packetType, bool isLoop)
+    public async Task<IAdaptFactory?> AddEventHandel(IAdaptFactory packetFactory, ControlPacketType packetType, bool isLoop)
     {
         if (isLoop)
         {

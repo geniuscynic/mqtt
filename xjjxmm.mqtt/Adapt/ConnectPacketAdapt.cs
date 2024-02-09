@@ -132,7 +132,7 @@ internal class ConnectPacketAdapt : IAdaptFactory
     
     private void PushHeaders()
     {
-        Data.Add((short)PacketType.Connect << 4);
+        Data.Add((short)ControlPacketType.Connect << 4);
     }
 
     private void PushRemainingLength()

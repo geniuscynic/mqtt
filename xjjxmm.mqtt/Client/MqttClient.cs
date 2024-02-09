@@ -31,7 +31,7 @@ public class MqttClient : IDisposable
         var packetFactory = AdaptFactory.CreatePacketFactory(option);
         await _mqttChannel.Connect((ConnectPacket)packetFactory!.GetPacket());
         //await _mqttChannel.Send(packetFactory.Encode());
-        packetFactory = await _dispatcher.AddEventHandel(packetFactory, PacketType.ConnAck);
+        packetFactory = await _dispatcher.AddEventHandel(packetFactory, ControlPacketType.ConnAck);
 
         var connAck = (ConnAckOption)packetFactory!.GetOption();
 
@@ -49,7 +49,7 @@ public class MqttClient : IDisposable
     private async Task Receive(ReceivedPacket receivedPacket)
     {
         var packetType = receivedPacket.GetPacketType();
-        if (packetType == PacketType.Publish)
+        if (packetType == ControlPacketType.Publish)
         {
             var packetFactory = AdaptFactory.CreatePacketFactory(receivedPacket);
             var publishPacket = (PublishPacket)packetFactory!.GetPacket();
@@ -78,7 +78,7 @@ public class MqttClient : IDisposable
                 };
 
                 packetFactory = AdaptFactory.CreatePacketFactory(pubRecPacket);
-                var pubRelFactory = await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRel);
+                var pubRelFactory = await _dispatcher.AddEventHandel(packetFactory!, ControlPacketType.PubRel);
                 var pubRelPacket = (PubRelPacket)pubRelFactory!.GetPacket();
                 var compPacket = new PubRecPacket()
                 {
@@ -104,7 +104,7 @@ public class MqttClient : IDisposable
             {
                 var packetFactory = AdaptFactory.CreatePacketFactory(new PingReqOption());
                 //await _mqttChannel.Send(packetFactory.Encode());
-                await _dispatcher.AddEventHandel(packetFactory!, PacketType.PingResp);
+                await _dispatcher.AddEventHandel(packetFactory!, ControlPacketType.PingResp);
 
                 await Task.Delay(second);
             }
@@ -150,7 +150,7 @@ public class MqttClient : IDisposable
             try
             {
                 //await _mqttChannel.Send(packetFactory!.Encode());
-                await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubAck);
+                await _dispatcher.AddEventHandel(packetFactory!, ControlPacketType.PubAck);
                 //var  pubAckPacket = (PubAckPacket) pubAckFactory!.GetPacket();
                 break;
                 //_packetIdentifierHashSet.Remove(pubAckPacket.PacketIdentifier);
@@ -180,7 +180,7 @@ public class MqttClient : IDisposable
             try
             {
                 //await _mqttChannel.Send(packetFactory!.Encode());
-                await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubRec);
+                await _dispatcher.AddEventHandel(packetFactory!, ControlPacketType.PubRec);
                 break;
             }
             catch(Exception ex)
@@ -196,7 +196,7 @@ public class MqttClient : IDisposable
         };
         packetFactory = AdaptFactory.CreatePacketFactory(pubRelPacket);
         //await _mqttChannel.Send(packetRelFactory!.Encode());
-        await _dispatcher.AddEventHandel(packetFactory!, PacketType.PubComp);
+        await _dispatcher.AddEventHandel(packetFactory!, ControlPacketType.PubComp);
     }
 
     public async Task<SubAckOption> Subscribe(SubscribeOption option)
@@ -206,7 +206,7 @@ public class MqttClient : IDisposable
         var packetFactory = AdaptFactory.CreatePacketFactory(option, packetIdentifier);
 
         //await _mqttChannel.Send(packetFactory!.Encode());
-        packetFactory = await _dispatcher.AddEventHandel(packetFactory!, PacketType.SubAck);
+        packetFactory = await _dispatcher.AddEventHandel(packetFactory!, ControlPacketType.SubAck);
 
         var subAckOption = (SubAckOption)packetFactory!.GetOption();
 

@@ -1,4 +1,5 @@
 ﻿using mqtt.server.Constant;
+using xjjxmm.mqtt.Constant;
 
 namespace xjjxmm.mqtt.Options
 {
@@ -9,7 +10,7 @@ namespace xjjxmm.mqtt.Options
         
         public string ClientId { get; set; } = clientId;
         
-        public byte ProtocolLevel { get; set; } = Protocol.Level3; //协议级别 
+        public byte ProtocolLevel { get; set; } = MqttProtocolLevel.V311; //协议级别 
 
         public bool CleanSession { get; set; } = true; //清理会话
 

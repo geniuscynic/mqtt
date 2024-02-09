@@ -44,7 +44,7 @@ internal class PubRelPacketAdapt : IAdaptFactory
   
     public ArraySegment<byte> Encode()
     {
-        var packetType = (byte)PacketType.PubRel << 4;
+        var packetType = (byte)ControlPacketType.PubRel << 4;
 
         var writeHelper = new BufferWriteHelper();
         writeHelper.SetHeader((byte)packetType);

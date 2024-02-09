@@ -1,7 +1,7 @@
 namespace xjjxmm.mqtt.Constant;
 
 
-public enum PacketType
+public enum ControlPacketType
 {
     // The connection request is sent by the server to the client to
     // request a connection to the server.
@@ -62,4 +62,7 @@ public enum PacketType
     // The disconnect message is sent by the client to the server to
     // terminate the connection.
     Disconnect = 0x0E,
+
+    //mq5
+    Auth = 0x0F,
 }

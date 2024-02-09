@@ -34,7 +34,7 @@ internal class PingReqPacketAdapt : IAdaptFactory
     {
         var bytes = new ArraySegment<byte>(new byte[]
         {
-            (byte)PacketType.PingReq << 4,
+            (byte)ControlPacketType.PingReq << 4,
             0x00
         });
         

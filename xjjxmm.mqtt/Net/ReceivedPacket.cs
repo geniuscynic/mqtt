@@ -16,10 +16,10 @@ internal class ReceivedPacket(SocketProxy socketProxy)
     public byte Header { get; private set; }
     public int RemainingLength { get; private set; }
 
-    public PacketType GetPacketType()
+    public ControlPacketType GetPacketType()
     {
         var header = (Header & 0xF0) >> 4;
-        return Enum.Parse<PacketType>(header.ToString());
+        return (ControlPacketType)header;
     }
 
     public async Task<int> Receive()
