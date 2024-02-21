@@ -189,24 +189,3 @@ public class MqttServer : IDisposable
         socketInfo = null;
     }
 }
-
-internal class SocketInfo
-{
-    public int Id { get; set; }
-
-    public string ClientId { get; set; }
-
-    //public Dispatcher Dispatcher { get; set; }
-    public MqttClientChannel Channel { get; set; }
-
-    public Dictionary<string, byte> SubscribeInfos { get; set; } = new();
-    
-    public DateTime LastLiveTime { get; set; }
-}
-
-internal class SubscribeInfo
-{
-    public string TopicName { get; set; }
-
-    public byte QoS { get; set; }
-}
