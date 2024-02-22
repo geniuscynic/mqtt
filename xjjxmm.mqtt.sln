@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xjjxmm.mqtt", "xjjxmm.mqtt\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xjjxmm.mqtt.sample", "xjjxmm.mqtt.sample\xjjxmm.mqtt.sample.csproj", "{FB0F69CE-E7A7-4D4F-AB16-0F15C5E0EB26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNgork.Server", "CNgork.Server\CNgork.Server.csproj", "{8F28EF96-A5FA-45D7-A800-798FA6163C1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNgork.Client", "CNgork.Client\CNgork.Client.csproj", "{17E69FBA-F45E-44BA-81E7-9B1B72946BA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{FB0F69CE-E7A7-4D4F-AB16-0F15C5E0EB26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB0F69CE-E7A7-4D4F-AB16-0F15C5E0EB26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB0F69CE-E7A7-4D4F-AB16-0F15C5E0EB26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F28EF96-A5FA-45D7-A800-798FA6163C1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F28EF96-A5FA-45D7-A800-798FA6163C1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F28EF96-A5FA-45D7-A800-798FA6163C1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F28EF96-A5FA-45D7-A800-798FA6163C1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17E69FBA-F45E-44BA-81E7-9B1B72946BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17E69FBA-F45E-44BA-81E7-9B1B72946BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17E69FBA-F45E-44BA-81E7-9B1B72946BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17E69FBA-F45E-44BA-81E7-9B1B72946BA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

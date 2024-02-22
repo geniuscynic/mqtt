@@ -4,7 +4,7 @@ using System.Net.Sockets;
 namespace xjjxmm.mqtt.Net
 {
     //https://zhuanlan.zhihu.com/p/653496155
-    internal class SocketProxy
+    public class SocketProxy
     {
         private const int ChunkSize = 8192;
         private readonly Socket _socket;
