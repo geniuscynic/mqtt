@@ -2,5 +2,5 @@
 
 using CNgork.Client;
 
-await new NgorkClient2().Start();
+await new NgorkClient().Start();
 Console.WriteLine("Hello, World!");

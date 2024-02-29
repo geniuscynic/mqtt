@@ -24,8 +24,8 @@ public class NgorkClient
                 ServerIp = "127.0.0.1",
                 ServerPort = 9000,
 
-                LocalIp = "127.0.0.1",
-                LocalPort = 8082
+                LocalIp = "121.229.36.245",
+                LocalPort = 8888
             }
         };
 
